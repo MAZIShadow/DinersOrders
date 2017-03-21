@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>PrimeUI example</title>
+        
+		<link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.css">
+		<link rel="stylesheet" href="resources/js/jquery-ui-1.12.1/jquery-ui.css">
+		<link rel="stylesheet" href="resources/js/primeui-4.1.15/primeui.css">
+		<script type="text/javascript" src="resources/js/jquery-3.2.0.js"></script>
+        <script type="text/javascript" src="resources/js/jquery-ui-1.12.1/jquery-ui.js"></script>
+        <script type="text/javascript" src="resources/js/primeui-4.1.15/primeui.min.js"></script>
+		<script type="text/javascript" src="resources/js/x-tag-core.min.js"></script>
+        <script type="text/javascript" src="resources/js/primeui-4.1.15/primeelements.js"></script>
+		<script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
+        <script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
+        <script type="text/javascript">
+            $(function() {
+                var cities = new Array(
+                    {label:'Sapporo', value:1},
+                    {label:'Tokyo', value:2},
+                    {label:'Ankara', value:3},
+                    {label:'London', value:4},
+                    {label:'New York City', value:5}
+                );
+                
+                $('#cities').puipicklist({
+                    sourceData: cities
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <span>PrimeUI Picklist</span>
+        <p/>
+        <form>
+            <div id="cities">
+                <select name="source">
+                </select>
+                <select name="target">
+                </select>
+            </div>
+        </form>
+    </body>
+</html>
