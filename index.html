@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <title>PrimeUI example</title>
-        
 		<link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.css">
 		<link rel="stylesheet" href="resources/js/jquery-ui-1.12.1/jquery-ui.css">
 		<link rel="stylesheet" href="resources/js/primeui-4.1.15/primeui.css">
@@ -15,31 +14,47 @@
 		<script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
         <script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
-            $(function() {
-                var cities = new Array(
-                    {label:'Sapporo', value:1},
-                    {label:'Tokyo', value:2},
-                    {label:'Ankara', value:3},
-                    {label:'London', value:4},
-                    {label:'New York City', value:5}
-                );
-                
-                $('#cities').puipicklist({
-                    sourceData: cities
-                });
-            });
-        </script>
+			$(document).ready(function(){
+				$.getJSON("services/get_clients.php", function(data) {
+					var items = [];
+					$.each(data, function(key, val) {
+						var idName = val['NAME'] + val['ID'];
+						var name = val['NAME'];
+						var desc = val['DESCRIPTION'] == null ? "Brak opisu" : val['DESCRIPTION'];
+						var component = "<fieldset id=\"" + idName + "\" style=\"margin:20px\"><legend>" + name + "<\/legend>" + desc + "<\/fieldset>";
+						items.push(component);
+					});
+					
+					//ładowanie koponentów i ustawienie eventów
+					$("#mainDiv").append(items).children("fieldset").each(function() {
+						$(this).puifieldset();
+						$(this).children("legend").each(function() {
+							$(this).click(function(evt) {
+								alert("haha");
+							});
+							$(this).hover(function() {
+								$(this).css('cursor','pointer');
+							}, function() {
+								$(this).css('cursor','auto');
+							});
+						});
+					});
+				
+				}).fail(function(jqxhr, textStatus, error) {
+					
+					var response = $(jqxhr.responseText).find("th:contains('Exception:')");
+					var message = response.length ? response[0].innerText : jqxhr.responseText;
+					$('#mainDiv').puimessages({closable: false});
+					$('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message });
+					
+					
+					
+				});
+			});
+		</script>
     </head>
     <body>
-        <span>PrimeUI Picklist</span>
-        <p/>
-        <form>
-            <div id="cities">
-                <select name="source">
-                </select>
-                <select name="target">
-                </select>
-            </div>
-        </form>
+	<div id="mainDiv">
+	</div>
     </body>
 </html>
