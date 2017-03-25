@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>PrimeUI example</title>
+        <title>Obiady Snooker</title>
 		<link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.css">
 		<link rel="stylesheet" href="resources/js/jquery-ui-1.12.1/jquery-ui.css">
 		<link rel="stylesheet" href="resources/js/primeui-4.1.15/primeui.css">
@@ -30,7 +30,7 @@
 						$(this).puifieldset();
 						$(this).children("legend").each(function() {
 							$(this).click(function(evt) {
-								alert("haha");
+								window.location.href = "clients/" + this.innerText;
 							});
 							$(this).hover(function() {
 								$(this).css('cursor','pointer');
@@ -41,14 +41,10 @@
 					});
 				
 				}).fail(function(jqxhr, textStatus, error) {
-					
 					var response = $(jqxhr.responseText).find("th:contains('Exception:')");
 					var message = response.length ? response[0].innerText : jqxhr.responseText;
 					$('#mainDiv').puimessages({closable: false});
 					$('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message });
-					
-					
-					
 				});
 			});
 		</script>

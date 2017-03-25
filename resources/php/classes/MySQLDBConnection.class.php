@@ -5,7 +5,7 @@ class MySQLDBConnection {
 	private $dbHost = "localhost";
 	private $dbLogin = "root";
 	private $dbPassword = "";
-	private $dbName = "rcmeal_cba_pl";
+	public $dbName = "homemeals";
 	private $mysqli = NULL;
 	
 	public function __construct()
@@ -19,11 +19,6 @@ class MySQLDBConnection {
 		if ($this->mysqli->connect_errno > 0) {
 			die('Could not connect: ' . $this->mysqli->connect_error);
 		}
-		
-		$this->mysqli->query("SET character_set_results=utf8");
-		mb_language('uni'); 
-		mb_internal_encoding('UTF-8');
-		$this->mysqli->query("set names 'utf8'");
 	}
 	
 	private function isConnected() {
@@ -32,6 +27,10 @@ class MySQLDBConnection {
 	
 	public function executeQuery($query) {
 		return $this->mysqli->query($query);
+	}
+	
+	public function prepareQuery($query) {
+		return $this->mysqli->prepare($query);
 	}
 	
 	function runQuery($query) {
@@ -44,6 +43,33 @@ class MySQLDBConnection {
 		if(!empty($resultset))
 		{
 			return $resultset;
+		}
+	}
+	
+	function runPreparedQuery($query, $bindParams) {
+		$stmt = $this->prepareQuery($query);
+		
+		if ($stmt) {
+			$params = array();
+			
+			foreach($bindParams as $key => $value) {
+				$params[$key] = &$bindParams[$key];
+			}
+			
+			call_user_func_array(array($stmt, 'bind_param'), $params);
+			$stmt->execute();
+			$result = $stmt->get_result();
+			
+			while($row = $result->fetch_assoc()) {
+				$resultset[] = $row;
+			}
+			
+			$stmt->close();
+			
+			if(!empty($resultset))
+			{
+				return $resultset;
+			}
 		}
 	}
 }

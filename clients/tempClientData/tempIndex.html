@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Lista zamównień</title>
+		<link rel="stylesheet" type="text/css" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
+		<link rel="stylesheet" href="../../resources/js/jquery-ui-1.12.1/jquery-ui.css">
+		<link rel="stylesheet" href="../../resources/js/primeui-4.1.15/primeui.css">
+		<script type="text/javascript" src="../../resources/js/jquery-3.2.0.js"></script>
+        <script type="text/javascript" src="../../resources/js/jquery-ui-1.12.1/jquery-ui.js"></script>
+        <script type="text/javascript" src="../../resources/js/primeui-4.1.15/primeui.min.js"></script>
+		<script type="text/javascript" src="../../resources/js/x-tag-core.min.js"></script>
+        <script type="text/javascript" src="../../resources/js/primeui-4.1.15/primeelements.js"></script>
+		<script type="text/javascript" src="../../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
+        <script type="text/javascript" src="../../resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
+        <script type="text/javascript">
+			$(document).ready(function(){
+				$.getJSON("services/get_orders.php", function(data) {
+					var items = [];
+										
+					$.each(data, function(key, val) {
+						var dinner = val['dinner'];
+						var name = dinner['NAME'];
+						var dinnerId = name + dinner['ID'];
+						var orders = val['orders'];
+						
+						if (orders != null && orders.length > 0) {
+							var totalAmount = 0;					
+							var component = "<fieldset id=\"" + dinnerId + "\" style=\"margin:20px;\"><legend>" + name + "<\/legend>";
+							component += "<div style=\"margin: 5px; padding: 2px; font-weight:bold\"><div style=\"width:60%; float:left\">Kto</div><div>Ilość</div></div>";
+							
+							$.each(orders, function(keyOrders, valOrders){
+								var orderName = valOrders['NAME'];
+								var amount = valOrders['AMOUNT'];
+								var orderComponent = "<div style=\"margin: 5px; padding: 2px\"><div style=\"width:60%; float:left\">" + orderName + "</div><div>" + amount + "</div></div>";
+								component += orderComponent;
+								totalAmount += parseInt(amount);
+							});
+							
+							component += "<div style=\"margin: 5px; padding: 2px; font-weight:bold\"><div style=\"width:60%; float:left\">Suma:</div><div>" + totalAmount + "</div></div>";
+							component += "<\/fieldset>";
+							items.push(component);
+						}
+					});
+					
+					if (items.length) {
+						//ładowanie koponentów i ustawienie eventów
+						$("#mainDiv").append(items).children("fieldset").each(function() {
+							$(this).puifieldset();
+						});
+					}
+					else {
+						$('#mainDiv').puimessages({closable: false});
+						$('#mainDiv').puimessages('show', 'info', {summary: 'Brak zamównień', detail: "" });
+						$('#mainDiv').css('margin-top','250px');
+					}
+				}).fail(function(jqxhr, textStatus, error) {
+					var response = $(jqxhr.responseText).find("th:contains('Exception:')");
+					var message = response.length ? response[0].innerText : jqxhr.responseText;
+					$('#mainDiv').puimessages({closable: false});
+					$('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message });
+					$('#mainDiv').css('margin-top','250px');
+				});
+			});
+		</script>
+    </head>
+    <body>
+	<center>
+		<div id="mainDiv" style="width:60%">
+		</div>
+	</center>
+    </body>
+</html>
