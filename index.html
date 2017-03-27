@@ -15,42 +15,52 @@
         <script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
 			$(document).ready(function(){
-				$.getJSON("services/get_clients.php", function(data) {
-					var items = [];
-					$.each(data, function(key, val) {
-						var idName = val['NAME'] + val['ID'];
-						var name = val['NAME'];
-						var desc = val['DESCRIPTION'] == null ? "Brak opisu" : val['DESCRIPTION'];
-						var component = "<fieldset id=\"" + idName + "\" style=\"margin:20px\"><legend>" + name + "<\/legend>" + desc + "<\/fieldset>";
-						items.push(component);
-					});
-					
-					//ładowanie koponentów i ustawienie eventów
-					$("#mainDiv").append(items).children("fieldset").each(function() {
-						$(this).puifieldset();
-						$(this).children("legend").each(function() {
-							$(this).click(function(evt) {
-								window.location.href = "clients/" + this.innerText;
-							});
-							$(this).hover(function() {
-								$(this).css('cursor','pointer');
-							}, function() {
-								$(this).css('cursor','auto');
-							});
-						});
-					});
+				$('#left').puitabview({
+					orientation: 'left'
+				});
 				
-				}).fail(function(jqxhr, textStatus, error) {
-					var response = $(jqxhr.responseText).find("th:contains('Exception:')");
-					var message = response.length ? response[0].innerText : jqxhr.responseText;
-					$('#mainDiv').puimessages({closable: false});
-					$('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message });
+				$('#loginButton').puibutton({
+					click: function(evt) {
+						$(this).hide();
+						window.location.href = "admin";
+					}
+				});
+				
+				$('#clientsButton').puibutton({
+					click: function(evt) {
+						$(this).hide();
+						window.location.href = "clients";
+					}
 				});
 			});
 		</script>
     </head>
     <body>
-	<div id="mainDiv">
-	</div>
+		<center>
+			<div id="left" style="width:60%">
+				<ul>
+					<li><a href="#tab1">Klienci</a></li>
+					<li><a href="#tab2">Panel</a></li>
+				</ul>
+				<div>
+					<div id="tab1">
+						<div>
+							Obiady dostarczamy dla wielu naszych klientów.
+						</div>
+						<div style="margin-top:20px">
+							<button id="clientsButton" type="button">Wejdź</button>
+						</div>
+					</div>
+					<div id="tab2">
+						<div>
+							Panel Administracyjny
+						</div>
+						<div style="margin-top:20px">
+							<button id="loginButton" type="button">Wejdź</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</center>
     </body>
 </html>

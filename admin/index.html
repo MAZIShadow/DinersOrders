@@ -14,22 +14,105 @@
 		<script type="text/javascript" src="../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
         <script type="text/javascript" src="../resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
-			$(function() {
-				$('#mainControl').puiaccordion({activeIndex : 0});
+			var today = new Date();
+			var dd = today.getDate();
+			dd = ('00'+dd).slice(-2);
+			var mm = today.getMonth()+1;
+			mm = ('00'+mm).slice(-2);
+			var yyyy = today.getFullYear();
+			var globalDate = yyyy + "-" + mm + "-" + dd;
+			
+			$(document).ready(function() {
+				$('#contentMeal').puifieldset();
+				dateSelect = function(event, value) {
+					globalDate = event;
+					$('#tableGrid').puidatatable('reload');
+				};
+			
+				$('#tableGrid').puidatatable({
+					lazy: true,
+					caption: null,
+					paginator: {
+						rows: 10,
+						totalRecords : 0,
+						pageLinks : 10
+					},
+					selectionMode: 'single',
+					columns: [
+						{field:'name', headerText: 'Nazwa posiłku', sortable:false}
+					],
+					
+					datasource: function(callback, ui) {
+						var uri = 'services/get_data.php?date=' + globalDate;
+						
+						$.ajax({
+							type: "GET",
+							url: uri,
+							dataType: "json",
+							context: this,
+							success: function(response) {
+								if (response.success === true) {
+									callback.call(this, response.rows);
+								} else {
+									var items = [];
+									var obj = new Object();
+									obj.name = "BRAK DAŃ";
+									items.push(obj);
+									callback.call(this, items);
+								}
+							},
+							error: function(response) {
+								alert('error');
+							}
+						}); 
+					}
+				});
+			
+				$('#left').puitabview({
+					orientation: 'left'
+				});
+				
+				$('#backButton').puibutton({
+					click: function(evt) {
+						$(this).hide();
+						window.location.href = "../"
+					}
+				});
+				
+				$('#addMealButton').puibutton();
+				$('#deleteMealButton').puibutton();
 			});
 			
 		</script>
     </head>
     <body>
-	<div id="mainControl">
-		<h3>Wprowadź menu</h3>
-		<div>
-			<div>MENU</div>
+	<div id="messages"></div>
+	<center>
+		<div id="left" style="width:50%">
+			<ul>
+				<li><a href="#tab1">Menu</a></li>
+				<li><a href="#tab2">Klienci</a></li>
+			</ul>
+			<div>
+				<div id="tab1">
+					<div id="topButtonsDiv">
+						<button id="addMealButton" type="button">Dodaj posiłek</button>
+						<button id="deleteMealButton" type="button">Usuń posiłek</button>
+					</div>
+					<fieldset id="contentMeal" style="margin: 5px">
+						<legend>Menu</legend>
+						<p-datepicker id="calendarDate" dateFormat="yy-mm-dd" onSelect="dateSelect" inline></p-datepicker>
+						<div id="tableGrid" style="margin-top:5px"></div>
+					</fieldset>
+				</div>
+				<div id="tab2">
+				</div>
+			</div>
 		</div>
-		<h3>Nowy klient</h3>
-		<div>
-			<div>MENU</div>
+	
+		<div id="bottomButtonsDiv" style="margin-top:5px">
+			<button id="backButton" type="button">Powrót</button>
 		</div>
-	</div>
+	</center>
     </body>
 </html>
