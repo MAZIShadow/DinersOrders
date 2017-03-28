@@ -19,6 +19,16 @@ class MySQLDBConnection {
 		if ($this->mysqli->connect_errno > 0) {
 			die('Could not connect: ' . $this->mysqli->connect_error);
 		}
+		
+		$this->mysqli->autocommit(FALSE);
+	}
+	
+	public function commit() {
+		$this->mysqli->commit();
+	}
+	
+	public function rollback() {
+		$this->mysqli->rollback();
 	}
 	
 	private function isConnected() {
@@ -33,7 +43,7 @@ class MySQLDBConnection {
 		return $this->mysqli->prepare($query);
 	}
 	
-	function runQuery($query) {
+	public function runQuery($query) {
 		$result = $this->mysqli->query($query);
 		
 		while($row = $result->fetch_assoc()) {
@@ -46,7 +56,7 @@ class MySQLDBConnection {
 		}
 	}
 	
-	function runPreparedQuery($query, $bindParams) {
+	public function runPreparedQuery($query, $bindParams) {
 		$stmt = $this->prepareQuery($query);
 		
 		if ($stmt) {

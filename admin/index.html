@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>PrimeUI example</title>
+        <title>Panel Administracyjny</title>
 		<link rel="stylesheet" type="text/css" href="../resources/font-awesome-4.7.0/css/font-awesome.css">
 		<link rel="stylesheet" href="../resources/js/jquery-ui-1.12.1/jquery-ui.css">
 		<link rel="stylesheet" href="../resources/js/primeui-4.1.15/primeui.css">
@@ -23,43 +23,36 @@
 			var globalDate = yyyy + "-" + mm + "-" + dd;
 			
 			$(document).ready(function() {
+			
+				$('#messages').puigrowl({life:3000});
+			
 				$('#contentMeal').puifieldset();
+				
 				dateSelect = function(event, value) {
 					globalDate = event;
 					$('#tableGrid').puidatatable('reload');
 				};
 			
 				$('#tableGrid').puidatatable({
-					lazy: true,
 					caption: null,
 					paginator: {
 						rows: 10,
-						totalRecords : 0,
-						pageLinks : 10
 					},
 					selectionMode: 'single',
 					columns: [
-						{field:'name', headerText: 'Nazwa posiłku', sortable:false}
+						{field:'name', headerText: 'Nazwa posiłku', sortable:false},
+						{field:'count', headerText: 'Liczba zamówień', sortable:false}
 					],
 					
 					datasource: function(callback, ui) {
-						var uri = 'services/get_data.php?date=' + globalDate;
-						
+						var uri = 'services/get_meal_data.php?date=' + globalDate;
 						$.ajax({
 							type: "GET",
 							url: uri,
 							dataType: "json",
 							context: this,
 							success: function(response) {
-								if (response.success === true) {
-									callback.call(this, response.rows);
-								} else {
-									var items = [];
-									var obj = new Object();
-									obj.name = "BRAK DAŃ";
-									items.push(obj);
-									callback.call(this, items);
-								}
+								callback.call(this, response.rows);
 							},
 							error: function(response) {
 								alert('error');
@@ -79,40 +72,202 @@
 					}
 				});
 				
-				$('#addMealButton').puibutton();
-				$('#deleteMealButton').puibutton();
+				$('#addMealButton').puibutton({
+					icon: 'ui-icon-circle-plus'
+				}).focus().click(function() {
+					$("#meal_form")[0].reset();
+					$("input[name='meal_id']").val(-1);
+					$('#edit_dialog_meal_label').text('Nowy posiłek');
+					$("input[name='meal_name']").val('');
+					$("input[name='meal_date']").val(globalDate);
+					$('#edit_dialog_meal').puidialog('show');
+				});
+				
+				$('#deleteMealButton').puibutton({
+					icon: 'ui-icon-circle-minus'
+				}).focus().click(function() {
+					var selections = $('#tableGrid').puidatatable('getSelection');
+					
+					if (selections.length === 1) {
+					
+						var selection = selections[0];
+						
+						if (selection.id < 0) {
+							return;
+						}
+						
+						$('#remove_dialog_meal_label').text('Usuń posiłek: ' + selection.name);
+						$('#remove_dialog_meal').puidialog('show');
+						$('#remove_dialog_meal #bt_remove_no').focus();
+					}
+				});
+				
+				$('#edit_dialog_meal').puidialog({
+					resizable: false,
+					draggable: false,
+					showEffect: 'fade',  
+					hideEffect: 'fade',  
+					minimizable: false,
+					maximizable: false,
+					modal: true,
+					width:650
+				});
+				
+				$('#edit_dialog_meal #bt_save').puibutton({ // Fire the submit event of the dialog form 
+					icon: 'ui-icon-disk'
+				});
+				
+				$('#edit_dialog_meal #bt_cancel').puibutton({
+					icon: 'ui-icon-close'
+				}).click(function() {
+					$('#edit_dialog_meal').puidialog('hide');
+				});
+				
+				$('#remove_dialog_meal').puidialog({
+					resizable: false,
+					draggable: false,
+					showEffect: 'fade',  
+					hideEffect: 'fade',  
+					minimizable: false,
+					maximizable: false,
+					modal: true,
+					width:650
+				});
+				
+				$('#remove_dialog_meal #bt_remove_no').puibutton({ // Fire the submit event of the dialog form 
+					icon: 'ui-icon-close'
+				}).click(function() {
+					$('#remove_dialog_meal').puidialog('hide');
+				});
+				
+				$('#remove_dialog_meal #bt_remove_yes').puibutton({
+					icon: 'ui-icon-disk'
+				}).click(function() {
+					var selections = $('#tableGrid').puidatatable('getSelection');
+					var meal = new Object();
+					meal.meal_id = selections[0].id;
+					meal.meal_name = selections[0].name;
+					
+					$.ajax({
+						type: "POST",
+						url: 'services/remove_meal_data.php',
+						data: meal,
+						dataType: "json",
+						context: this,
+						success: function(response) {
+							$('#remove_dialog_meal').puidialog('hide');
+							
+							if (response.success) {
+								$('#tableGrid').puidatatable('reload');
+								$('#messages').puigrowl('show', [{severity:'info', summary: 'Usunięto posiłek', detail: response.msg}]);
+							} else {
+								$('#messages').puigrowl('show', [{severity:'error', summary: 'Usunięto posiłek', detail: response.msg}]);
+							}
+						},
+						error: function(response) {
+							$('#remove_dialog_meal').puidialog('hide');
+							$('#messages').puigrowl('show', [{severity:'error', summary: 'Remove product', detail: 'Oups! Unable to remove the selected product.'}]);
+						}
+					});
+				});
+				
+				$('#meal_form').submit(function(event) {
+					var result = $("#meal_form")[0].checkValidity();
+					
+					if (result) {
+						var product = $('#meal_form').serializeArray();
+						
+						$.ajax({
+							type: "POST",
+							url: "services/save_meal_data.php",
+							data: product,
+							dataType: "json",
+							context: this,
+							success: function(response) {
+							
+								var summaryMsg = response.action === 'new' ? 'Zapis posiłku' : 'Aktualizacja posiłku';
+							
+								if (response.success) {
+									$('#messages').puigrowl('show', [{severity:'info', summary: summaryMsg, detail: response.msg}]);
+									$('#edit_dialog_meal').puidialog('hide');
+									$('#tableGrid').puidatatable('reload');
+								} else {
+									$('#messages').puigrowl('show', [{severity:'error', summary: summaryMsg, detail: response.msg}]);
+								}
+							},
+							error: function(response) {
+							
+								$('#messages').puigrowl('show', [{severity:'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
+							}
+						});
+					}
+					event.preventDefault();
+				});
 			});
-			
 		</script>
     </head>
     <body>
-	<div id="messages"></div>
-	<center>
-		<div id="left" style="width:50%">
-			<ul>
-				<li><a href="#tab1">Menu</a></li>
-				<li><a href="#tab2">Klienci</a></li>
-			</ul>
-			<div>
-				<div id="tab1">
-					<div id="topButtonsDiv">
-						<button id="addMealButton" type="button">Dodaj posiłek</button>
-						<button id="deleteMealButton" type="button">Usuń posiłek</button>
+		<div id="messages"></div>
+		<center>
+			<div id="left" style="width:50%">
+				<ul>
+					<li><a href="#tab1">Menu</a></li>
+					<li><a href="#tab2">Klienci</a></li>
+				</ul>
+				<div>
+					<div id="tab1">
+						<div id="topButtonsDiv">
+							<button id="addMealButton" type="button">Dodaj posiłek</button>
+							<button id="deleteMealButton" type="button">Usuń posiłek</button>
+						</div>
+						<fieldset id="contentMeal" style="margin: 5px">
+							<legend>Menu</legend>
+							<p-datepicker id="calendarDate" dateFormat="yy-mm-dd" onSelect="dateSelect" inline></p-datepicker>
+							<div id="tableGrid" style="margin-top:5px"></div>
+						</fieldset>
 					</div>
-					<fieldset id="contentMeal" style="margin: 5px">
-						<legend>Menu</legend>
-						<p-datepicker id="calendarDate" dateFormat="yy-mm-dd" onSelect="dateSelect" inline></p-datepicker>
-						<div id="tableGrid" style="margin-top:5px"></div>
-					</fieldset>
+					<div id="tab2">
+					</div>
 				</div>
-				<div id="tab2">
+			</div>
+			<div id="bottomButtonsDiv">
+				<button id="backButton" type="button">Powrót</button>
+			</div>
+		</center>
+	
+		<!-- form dialog -->
+		<div id="edit_dialog_meal" title="Posiłek">
+			<form id="meal_form">
+				<div>
+					<input name="meal_id" type="hidden">
+					<input name="meal_date" type="hidden">
+					<div class="ui-grid ui-grid-responsive">
+						<div class="ui-grid-row">
+							<div class="ui-grid-col-4">
+								<label class="required">Nazwa posiłku:</label>
+							</div>
+							<div class="ui-grid-col-4">
+								<input name="meal_name" maxlength="250" required>
+							</div>
+						</div>
+						
+					</div>
 				</div>
+				<div id="bottomButtonsDiv">
+					<button id="bt_save" type="submit">Zapisz</button>
+					<button id="bt_cancel" type="button">Anuluj</button>
+				</div>
+			</form>
+		</div>
+		
+		<!-- Remove confirmation dialog -->
+		<div id="remove_dialog_meal" title="Usuń posiłek...">
+			<p>Czy na pewno chcesz usunąć ten posiłek?</p>
+			<div id="bottomButtonsDiv">
+				<button id="bt_remove_yes" type="button">Tak</button>
+				<button id="bt_remove_no" type="button">Nie</button>
 			</div>
 		</div>
 	
-		<div id="bottomButtonsDiv" style="margin-top:5px">
-			<button id="backButton" type="button">Powrót</button>
-		</div>
-	</center>
     </body>
 </html>
