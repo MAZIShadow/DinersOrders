@@ -22,30 +22,36 @@
 					}
 				});
 				
-				$.getJSON("../services/get_clients.php", function(data) {
-					var items = [];
-					$.each(data, function(key, val) {
-						var idName = val['NAME'] + val['ID'];
-						var name = val['NAME'];
-						var desc = val['DESCRIPTION'] == null ? "Brak opisu" : val['DESCRIPTION'];
-						var component = "<fieldset id=\"" + idName + "\" style=\"margin:20px\"><legend>" + name + "<\/legend>" + desc + "<\/fieldset>";
-						items.push(component);
-					});
-					
-					//ładowanie koponentów i ustawienie eventów
-					$("#mainDiv").append(items).children("fieldset").each(function() {
-						$(this).puifieldset();
-						$(this).children("legend").each(function() {
-							$(this).click(function(evt) {
-								window.location.href = this.innerText;
-							});
-							$(this).hover(function() {
-								$(this).css('cursor','pointer');
-							}, function() {
-								$(this).css('cursor','auto');
+				$.getJSON("services/get_clients.php", function(response) {
+				
+					if (response.success === true) {				
+						var items = [];
+						$.each(response.data, function(key, val) {
+							var name = val.NAME;
+							var idName = name + val.ID;
+							var desc = val.DESCRIPTION == null ? "Brak opisu" : val.DESCRIPTION;
+							var component = "<fieldset id=\"" + idName + "\" style=\"margin:20px\"><legend>" + name + "<\/legend>" + desc + "<\/fieldset>";
+							items.push(component);
+						});
+						
+						//ładowanie koponentów i ustawienie eventów
+						$("#mainDiv").append(items).children("fieldset").each(function() {
+							$(this).puifieldset();
+							$(this).children("legend").each(function() {
+								$(this).click(function(evt) {
+									window.location.href = this.innerText;
+								});
+								$(this).hover(function() {
+									$(this).css('cursor','pointer');
+								}, function() {
+									$(this).css('cursor','auto');
+								});
 							});
 						});
-					});
+					} else {
+						$('#mainDiv').puimessages({closable: false});
+						$('#mainDiv').puimessages('show', 'info', {summary: 'Brak klientów', detail: "" });
+					}
 				
 				}).fail(function(jqxhr, textStatus, error) {
 					var response = $(jqxhr.responseText).find("th:contains('Exception:')");
@@ -53,13 +59,26 @@
 					$('#mainDiv').puimessages({closable: false});
 					$('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message });
 				});
+				
+				$('#left').puitabview({
+					orientation: 'left'
+				});
 			});
 		</script>
     </head>
     <body>
 		<center>
-			<div id="mainDiv" style="width:60%">
-			</div>
+			<div id="left" class="mainTabView">
+				<ul>
+					<li><a href="#tab1">Klienci</a></li>
+				</ul>
+				<div>
+					<div id="tab1">
+						<div id="mainDiv">
+						</div>
+					</div>
+				</div>
+			</div>		
 			<div id="bottomButtonsDiv">
 				<button id="backButton" type="button">Powrót</button>
 			</div>
