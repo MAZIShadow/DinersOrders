@@ -14,12 +14,9 @@
 		<script type="text/javascript" src="../../../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
         <script type="text/javascript" src="../../../resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
-			
-			function checkOrderTime() {
-				alert('checkOrderTime Not implemented yet');
-			}
-			
 			$(document).ready(function(){
+				$('#messages').puigrowl({life:3000});
+						
 				$('#backButton').puibutton({
 					click: function(evt) {
 						$(this).hide();
@@ -27,11 +24,7 @@
 					}
 				});
 				
-				$('#btnSaveOrder').puibutton({
-					click: function(evt) {
-						$(this).hide();
-					}
-				});
+				$('#btnSaveOrder').puibutton();
 				
 				$('#left').puitabview({
 					orientation: 'left'
@@ -76,49 +69,80 @@
 					max:5
 				});
 				
-				checkOrderTime();
+				$('#order_form').submit(function(event) {
+					var result = $("#order_form")[0].checkValidity();
+					
+					if (result) {
+						$('#btnSaveOrder').hide();
+						var product = $('#order_form').serializeArray();
+						
+						$.ajax({
+							type: "POST",
+							url: "services/save_order_data.php",
+							data: product,
+							dataType: "json",
+							context: this,
+							success: function(response) {
+								var summaryMsg = response.action === 'new' ? 'Zapis posiłku' : 'Aktualizacja posiłku';
+							
+								if (response.success === true) {
+									$('#messages').puigrowl('show', [{severity:'info', summary: summaryMsg, detail: response.msg}]);
+									window.location.href = "../";
+								} else {
+									$('#messages').puigrowl('show', [{severity:'error', summary: summaryMsg, detail: response.msg}]);
+								}
+							},
+							error: function(response) {
+								$('#messages').puigrowl('show', [{severity:'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
+							}
+						});
+					}
+					event.preventDefault();
+				});
 			});
 		</script>
     </head>
     <body>
-	<center>
-		<div id="topButtonsDiv">
-		</div>
-		<div id="left" class="mainTabView">
-			<ul>
-				<li><a href="#tab1">Zamówienie</a></li>
-			</ul>
-			<div>
-				<div id="tab1">
-					<div id="topButtonsDiv">
-						<button id="btnSaveOrder" type="button">Złóż zamówienie</button>
-					</div>
-					<div id="mainDiv" style="text-align: left; padding: 10px">
+		<div id="messages"></div>
+		<center>
+			<div id="topButtonsDiv">
+			</div>
+			<div id="left" class="mainTabView">
+				<ul>
+					<li><a href="#tab1">Zamówienie</a></li>
+				</ul>
+				<div>
+					<div id="tab1">
 						<form id="order_form">
-							<div class="ui-grid ui-grid-responsive">
-								<div class="ui-grid-row">
-									<div class="ui-grid-col-3">
-										<label class="required">Podaj imię:</label>
+							<div id="topButtonsDiv">
+								<button id="btnSaveOrder" type="submit">Złóż zamówienie</button>
+							</div>
+							<div id="mainDiv" style="text-align: left; padding: 10px">
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<div class="ui-grid-col-3">
+											<label class="required">Podaj imię:</label>
+										</div>
+										<div class="ui-grid-col-3">
+											<input name="user_name" maxlength="250" type="text" required />
+										</div>
 									</div>
-									<div class="ui-grid-col-3">
-										<input name="user_name" maxlength="250" type="text" required />
+									<div class="ui-grid-row">
+										<div class="ui-grid-col-3">
+											<label class="required">Zamówienie:</label>
+										</div>
+										<div class="ui-grid-col-3">
+											<select id="meal_id" name="meal_id" required>
+											</select>
+										</div>
 									</div>
-								</div>
-								<div class="ui-grid-row">
-									<div class="ui-grid-col-3">
-										<label class="required">Zamówienie:</label>
-									</div>
-									<div class="ui-grid-col-3">
-										<select id="meal_id" name="meal_id" required>
-										</select>
-									</div>
-								</div>
-								<div class="ui-grid-row">
-									<div class="ui-grid-col-3">
-										<label class="required">Ilość:</label>
-									</div>
-									<div class="ui-grid-col-3">
-										<input id="meal_amount" name="meal_amount" type="text" value="1" required/>
+									<div class="ui-grid-row">
+										<div class="ui-grid-col-3">
+											<label class="required">Ilość:</label>
+										</div>
+										<div class="ui-grid-col-3">
+											<input id="meal_amount" name="meal_amount" type="text" value="1" required/>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -126,10 +150,9 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div id="bottomButtonsDiv">
-			<button id="backButton" type="button">Powrót</button>
-		</div>
-	</center>
+			<div id="bottomButtonsDiv">
+				<button id="backButton" type="button">Powrót</button>
+			</div>
+		</center>
     </body>
 </html>

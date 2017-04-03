@@ -203,6 +203,172 @@
 					}
 					event.preventDefault();
 				});
+				
+				<!-- clients content -->
+				$('#contentClient').puifieldset();
+				
+				$('#addClientButton').puibutton({
+					icon: 'ui-icon-circle-plus'
+				}).focus().click(function() {
+					$("#client_form")[0].reset();
+					$("input[name='client_id']").val(-1);
+					$('#edit_dialog_client_label').text('Nowy Klient');
+					$("input[name='client_name']").val('');
+					$("textarea[name='client_desc']").val('');
+					$('#edit_dialog_client').puidialog('show');
+				});
+				
+				$('#deleteClientButton').puibutton({
+					icon: 'ui-icon-circle-minus'
+				}).focus().click(function() {
+					var selections = $('#clientTableGrid').puidatatable('getSelection');
+					
+					if (selections.length === 1) {
+					
+						var selection = selections[0];
+						
+						if (selection.id < 0) {
+							return;
+						}
+						
+						$('#remove_dialog_client_label').text('Usuń klienta: ' + selection.NAME);
+						$('#remove_dialog_client').puidialog('show');
+						$('#remove_dialog_client #bt_remove_no').focus();
+					}
+				});
+				
+				$('#clientTableGrid').puidatatable({
+					caption: null,
+					paginator: {
+						rows: 10,
+					},
+					selectionMode: 'single',
+					columns: [
+						{field:'NAME', headerText: 'Nazwa klienta', sortable:false},
+						{field:'DESCRIPTION', headerText: 'Opis', sortable:false}
+					],
+					
+					datasource: function(callback, ui) {
+						var uri = 'services/get_client_data.php';
+						$.ajax({
+							type: "GET",
+							url: uri,
+							dataType: "json",
+							context: this,
+							success: function(response) {
+								callback.call(this, response.rows);
+							},
+							error: function(response) {
+								alert('error');
+							}
+						}); 
+					}
+				});
+				
+				$('#edit_dialog_client').puidialog({
+					resizable: false,
+					draggable: false,
+					showEffect: 'fade',  
+					hideEffect: 'fade',  
+					minimizable: false,
+					maximizable: false,
+					modal: true,
+					width:650
+				});
+				
+				$('#edit_dialog_client #client_desc').puiinputtextarea({counter:$('#display'), counterTemplate:'{0} pozostało znaków.', maxlength:500});
+				
+				$('#edit_dialog_client #bt_save').puibutton({ // Fire the submit event of the dialog form 
+					icon: 'ui-icon-disk'
+				});
+				
+				$('#edit_dialog_client #bt_cancel').puibutton({
+					icon: 'ui-icon-close'
+				}).click(function() {
+					$('#edit_dialog_client').puidialog('hide');
+				});
+				
+				$('#client_form').submit(function(event) {
+					var result = $("#client_form")[0].checkValidity();
+					
+					if (result) {
+						var client = $('#client_form').serializeArray();
+						
+						$.ajax({
+							type: "POST",
+							url: "services/save_client_data.php",
+							data: client,
+							dataType: "json",
+							context: this,
+							success: function(response) {
+							
+								var summaryMsg = response.action === 'new' ? 'Zapis klienta' : 'Aktualizacja klienta';
+							
+								if (response.success) {
+									$('#messages').puigrowl('show', [{severity:'info', summary: summaryMsg, detail: response.msg}]);
+									$('#edit_dialog_client').puidialog('hide');
+									$('#clientTableGrid').puidatatable('reload');
+								} else {
+									$('#messages').puigrowl('show', [{severity:'error', summary: summaryMsg, detail: response.msg}]);
+								}
+							},
+							error: function(response) {
+							
+								$('#messages').puigrowl('show', [{severity:'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
+							}
+						});
+					}
+					event.preventDefault();
+				});
+				
+				$('#remove_dialog_client').puidialog({
+					resizable: false,
+					draggable: false,
+					showEffect: 'fade',  
+					hideEffect: 'fade',  
+					minimizable: false,
+					maximizable: false,
+					modal: true,
+					width:650
+				});
+				
+				$('#remove_dialog_client #bt_remove_no').puibutton({ // Fire the submit event of the dialog form 
+					icon: 'ui-icon-close'
+				}).click(function() {
+					$('#remove_dialog_client').puidialog('hide');
+				});
+				
+				$('#remove_dialog_client #bt_remove_yes').puibutton({
+					icon: 'ui-icon-disk'
+				}).click(function() {
+					var selections = $('#clientTableGrid').puidatatable('getSelection');
+					var client = new Object();
+					client.client_id = selections[0].ID;
+					client.client_name = selections[0].NAME;
+					
+					$.ajax({
+						type: "POST",
+						url: 'services/remove_client_data.php',
+						data: client,
+						dataType: "json",
+						context: this,
+						success: function(response) {
+							$('#remove_dialog_client').puidialog('hide');
+							
+							if (response.success) {
+								$('#clientTableGrid').puidatatable('reload');
+								$('#messages').puigrowl('show', [{severity:'info', summary: 'Usunięto posiłek', detail: response.msg}]);
+							} else {
+								$('#messages').puigrowl('show', [{severity:'error', summary: 'Usunięto posiłek', detail: response.msg}]);
+							}
+						},
+						error: function(response) {
+							$('#remove_dialog_meal').puidialog('hide');
+							$('#messages').puigrowl('show', [{severity:'error', summary: 'Remove product', detail: 'Oups! Unable to remove the selected product.'}]);
+						}
+					});
+				});
+				
 			});
 		</script>
     </head>
@@ -227,6 +393,14 @@
 						</fieldset>
 					</div>
 					<div id="tab2">
+						<div id="topButtonsDiv">
+							<button id="addClientButton" type="button">Dodaj klienta</button>
+							<button id="deleteClientButton" type="button">Usuń klienta</button>
+						</div>
+						<fieldset id="contentClient" style="margin: 5px">
+							<legend>Klienci</legend>
+							<div id="clientTableGrid" style="margin-top:5px"></div>
+						</fieldset>
 					</div>
 				</div>
 			</div>
@@ -262,6 +436,47 @@
 		<!-- Remove confirmation dialog -->
 		<div id="remove_dialog_meal" title="Usuń posiłek...">
 			<p>Czy na pewno chcesz usunąć ten posiłek?</p>
+			<div id="bottomButtonsDiv">
+				<button id="bt_remove_yes" type="button">Tak</button>
+				<button id="bt_remove_no" type="button">Nie</button>
+			</div>
+		</div>
+		
+		<!-- client form dialog -->
+		<div id="edit_dialog_client" title="Klient">
+			<form id="client_form">
+				<div>
+					<input name="client_id" type="hidden">
+					<div class="ui-grid ui-grid-responsive">
+						<div class="ui-grid-row">
+							<div class="ui-grid-col-4">
+								<label class="required">Nazwa klienta:</label>
+							</div>
+							<div class="ui-grid-col-4">
+								<input name="client_name" maxlength="45" required>
+							</div>
+						</div>
+						<div class="ui-grid-row">
+							<div class="ui-grid-col-4">
+								<label class="required">Opis klienta:</label>
+							</div>
+							<div class="ui-grid-col-4">
+								<textarea id="client_desc" rows="5" cols="35" required></textarea>
+								<span id="display"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="bottomButtonsDiv">
+					<button id="bt_save" type="submit">Zapisz</button>
+					<button id="bt_cancel" type="button">Anuluj</button>
+				</div>
+			</form>
+		</div>
+		
+		<!-- Remove confirmation dialog -->
+		<div id="remove_dialog_client" title="Usuń posiłek...">
+			<p>Czy na pewno chcesz usunąć tego klienta?</p>
 			<div id="bottomButtonsDiv">
 				<button id="bt_remove_yes" type="button">Tak</button>
 				<button id="bt_remove_no" type="button">Nie</button>
