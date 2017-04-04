@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Panel Sterowania"
+AuthUserFile 'c:/wamp/www/DinersOrders/.htpasswd'
+Require user admin 

@@ -309,6 +309,8 @@
 									$('#edit_dialog_client').puidialog('hide');
 									$('#clientTableGrid').puidatatable('reload');
 								} else {
+									$('#edit_dialog_client').puidialog('hide');
+									$('#clientTableGrid').puidatatable('reload');
 									$('#messages').puigrowl('show', [{severity:'error', summary: summaryMsg, detail: response.msg}]);
 								}
 							},
@@ -461,7 +463,7 @@
 								<label class="required">Opis klienta:</label>
 							</div>
 							<div class="ui-grid-col-4">
-								<textarea id="client_desc" rows="5" cols="35" required></textarea>
+								<textarea id="client_desc" name="client_desc" rows="5" cols="35"></textarea>
 								<span id="display"></span>
 							</div>
 						</div>

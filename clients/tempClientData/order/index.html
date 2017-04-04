@@ -41,7 +41,6 @@
 							dataType: "json",
 							context: this,
 							success: function(response) {
-							
 								var items = [];
 							
 								if (response.success === true) {
@@ -56,6 +55,7 @@
 									item.label = 'Brak danych';
 									item.value = -1;
 									items.push(item);
+									$('#btnSaveOrder').hide();
 								}
 								
 								callback.call(this, items);

@@ -1,3 +1,0 @@
-<?php
-$clientName = "MAZI_";
-?>
