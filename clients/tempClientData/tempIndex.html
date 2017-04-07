@@ -3,119 +3,118 @@
     <head>
         <meta charset="UTF-8">
         <title>Lista zamównień</title>
-		<link rel="stylesheet" type="text/css" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
-		<link rel="stylesheet" href="../../resources/js/jquery-ui-1.12.1/jquery-ui.css">
-		<link rel="stylesheet" href="../../resources/js/primeui-4.1.15/primeui.css">
-		<script type="text/javascript" src="../../resources/js/jquery-3.2.0.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
+        <link rel="stylesheet" href="../../resources/js/jquery-ui-1.12.1/jquery-ui.css">
+        <link rel="stylesheet" href="../../resources/js/primeui-4.1.15/primeui.css">
+        <link rel="stylesheet" href="../../resources/css/main.css">
+        <script type="text/javascript" src="../../resources/js/jquery-3.2.0.js"></script>
         <script type="text/javascript" src="../../resources/js/jquery-ui-1.12.1/jquery-ui.js"></script>
         <script type="text/javascript" src="../../resources/js/primeui-4.1.15/primeui.min.js"></script>
-		<script type="text/javascript" src="../../resources/js/x-tag-core.min.js"></script>
+        <script type="text/javascript" src="../../resources/js/x-tag-core.min.js"></script>
         <script type="text/javascript" src="../../resources/js/primeui-4.1.15/primeelements.js"></script>
-		<script type="text/javascript" src="../../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
+        <script type="text/javascript" src="../../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
         <script type="text/javascript" src="../../resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
-			
-			function loadData() {
-				$.getJSON("services/get_orders_today.php", function(response) {				
-				
-					if (response.success === true) {
-						var items = [];
-									
-						$.each(response.data, function(key, val) {
-							var dinner = val.dinner;
-							var name = dinner.NAME;
-							var dinnerId = name + dinner.ID;
-							var orders = val.orders;							
-							var totalAmount = 0;					
-							var component = "<fieldset id=\"" + dinnerId + "\" style=\"margin:20px;\"><legend>" + name + "<\/legend>";
-							component += "<div style=\"margin: 5px; padding: 2px; font-weight:bold\"><div style=\"width:60%; float:left\">Kto</div><div>Ilość</div></div>";
-							
-							$.each(orders, function(keyOrders, valOrders){
-								var orderName = valOrders['NAME'];
-								var amount = valOrders['AMOUNT'];
-								var orderComponent = "<div style=\"margin: 5px; padding: 2px\"><div style=\"width:60%; float:left\">" + orderName + "</div><div>" + amount + "</div></div>";
-								component += orderComponent;
-								totalAmount += parseInt(amount);
-							});
-							
-							component += "<div style=\"margin: 5px; padding: 2px; font-weight:bold\"><div style=\"width:60%; float:left\">Suma:</div><div>" + totalAmount + "</div></div>";
-							component += "<\/fieldset>";
-							items.push(component);						
-						});
-						
-						$("#mainDiv").append(items).children("fieldset").each(function() {
-							$(this).puifieldset({
-								toggleable:true
-							});
-						});
-						
-					} else {
-						$('#mainDiv').puimessages({closable: false});
-						$('#mainDiv').puimessages('show', 'info', {summary: 'Brak menu', detail: "" });
-					}
-				}).fail(function(jqxhr, textStatus, error) {
-					var response = $(jqxhr.responseText).find("th:contains('Exception:')");
-					var message = response.length ? response[0].innerText : jqxhr.responseText;
-					$('#mainDiv').puimessages({closable: false});
-					$('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message });
-					$('#mainDiv').css('margin-top','250px');
-				});
-			}
-		
-		
-			$(document).ready(function(){
-				$('#backButton').puibutton({
-					click: function(evt) {
-						$(this).hide();
-						window.location.href = "../"
-					}
-				});
-				
-				$('#orderButton').puibutton({
-					click: function(evt) {
-						$(this).hide();
-						window.location.href = "order";
-					}
-				});
-				
-				$('#deleteButton').puibutton({
-					click: function(evt) {
-						$(this).hide();
-					}
-				});
-				
-				$('#left').puitabview({
-					orientation: 'left'
-				});
-				
-				loadData();
-			});
-		</script>
+
+            function loadData() {
+                $.getJSON("services/get_orders_today.php", function (response) {
+
+                    if (response.success === true) {
+                        var items = [];
+
+                        $.each(response.data, function (key, val) {
+                            var dinner = val.dinner;
+                            var name = dinner.NAME;
+                            var dinnerId = name + dinner.ID;
+                            var orders = val.orders;
+                            var totalAmount = 0;
+                            var puiRowClassName = 'ui-grid-col-6';
+                            var component = "<fieldset id=\"" + dinnerId + "\" class=\"fieldsetRowMeal\"><legend>" + name + "<\/legend>";
+                            component += "<div class=\"ui-grid ui-grid-responsive\"><div class=\"ui-grid-row fieldsetRowMealHeaderFooter\"><div class=\"" + puiRowClassName + "\">Kto</div><div class=\"" + puiRowClassName + "\">Ilość</div></div>";
+
+                            $.each(orders, function (keyOrders, valOrders) {
+                                var orderName = valOrders.NAME;
+                                var amount = valOrders.AMOUNT;
+                                var orderComponent = "<div class=\"ui-grid-row fieldsetRowMealData\"><div class=\"" + puiRowClassName + "\">" + orderName + "</div><div class=\"" + puiRowClassName + "\">" + amount + "</div></div>";
+                                component += orderComponent;
+                                totalAmount += parseInt(amount);
+                            });
+
+                            component += "<div class=\"ui-grid-row fieldsetRowMealHeaderFooter\"><div class=\"" + puiRowClassName + "\">Suma:</div><div class=\"" + puiRowClassName + "\">" + totalAmount + "</div></div></div>";
+                            component += "<\/fieldset>";
+                            items.push(component);
+                        });
+
+                        $("#mainDiv").append(items).children("fieldset").each(function () {
+                            $(this).puifieldset({
+                                toggleable: true
+                            });
+                        });
+
+                    } else {
+                        $('#orderTopButtons').hide();
+                        $('#mainDiv').puimessages({closable: false});
+                        $('#mainDiv').puimessages('show', 'info', {summary: 'Brak menu', detail: ""});
+                    }
+                }).fail(function (jqxhr) {
+                    var response = $(jqxhr.responseText).find("th:contains('Exception:')");
+                    var message = response.length ? response[0].innerText : jqxhr.responseText;
+                    $('#mainDiv').puimessages({closable: false});
+                    $('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message});
+                    $('#mainDiv').css('margin-top', '250px');
+                });
+            }
+
+
+            $(document).ready(function () {
+                $('#backButton').puibutton({
+                    click: function (evt) {
+                        $(this).hide();
+                        window.location.href = "../";
+                    }
+                });
+                $('#orderTopButtons').puifieldset();
+                $('#orderButton').puibutton({
+                    click: function (evt) {
+                        $(this).hide();
+                        window.location.href = "order";
+                    }
+                });
+
+                $('#deleteButton').puibutton({
+                    click: function (evt) {
+                        $(this).hide();
+                    }
+                });
+
+                $('#left').puitabview({
+                    orientation: 'left'
+                });
+
+                loadData();
+            });
+        </script>
     </head>
     <body>
-	<center>
-		<div id="topButtonsDiv">
-		</div>
-		<div id="left" class="mainTabView">
-			<ul>
-				<li><a href="#tab1">Zamówienia</a></li>
-			</ul>
-			<div>
-				<div id="tab1">
-					<div id="topButtonsDiv">
-						<button id="orderButton" type="button">Zamów</button>
-						<button id="deleteButton" type="button" style="display:none">Usuń zamówienie</button>
-					</div>
-					<div id="mainDiv">
-					</div>
-				</div>
-				<div id="tab2">
-				</div>
-			</div>
-		</div>
-		<div id="bottomButtonsDiv">
-			<button id="backButton" type="button">Powrót</button>
-		</div>
-	</center>
+        <div id="left" class="mainTabView">
+            <ul>
+                <li><a href="#tab1">Zamówienia</a></li>
+            </ul>
+            <div>
+                <div id="tab1">
+                    <fieldset id="orderTopButtons" class="fieldsetTopRightButtons">
+                        <button id="orderButton" type="button">Zamów</button>
+                        <button id="deleteButton" type="button" style="display:none">Usuń zamówienie</button>
+                    </fieldset>
+                    <div id="mainDiv">
+                    </div>
+                </div>
+                <div id="tab2">
+                </div>
+            </div>
+        </div>
+        <div class="bottomButtonsDiv">
+            <button id="backButton" type="button">Powrót</button>
+        </div>
     </body>
 </html>

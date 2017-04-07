@@ -1,0 +1,69 @@
+body {
+    margin: auto;
+    width: 70%;
+    padding: 5px;
+}
+
+.fieldsetTopRightButtons {
+    padding: 10px;
+}
+
+.mainContent {
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.mainContentClientList {
+    text-align: left;
+    padding: 5px;
+}
+
+.mainContentOrderMeal {
+    text-align: left;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+.mainContentCenter {
+    margin-top: 0px;
+    text-align: center;
+}
+
+.bottomButtonsDiv {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.dialogBottomButtons {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.ui-grid-row-ext {
+    margin-top: 5px;
+}
+
+.enterButtonPanelCenter {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+
+.fieldsetRowClient {
+    margin-top: 10px;
+}
+
+.fieldsetRowMeal {
+    margin-top: 10px;
+}
+
+.fieldsetRowMealHeaderFooter {
+    padding: 2px;
+    font-weight:bold;
+    text-align: center;
+}
+
+.fieldsetRowMealData {
+    padding: 2px;
+    text-align: center;
+}

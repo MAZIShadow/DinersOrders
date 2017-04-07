@@ -3,85 +3,86 @@
     <head>
         <meta charset="UTF-8">
         <title>Obiady Snooker</title>
-		<link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.css">
-		<link rel="stylesheet" href="../resources/js/jquery-ui-1.12.1/jquery-ui.css">
-		<link rel="stylesheet" href="../resources/js/primeui-4.1.15/primeui.css">
-		<script type="text/javascript" src="../resources/js/jquery-3.2.0.js"></script>
+        <link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.css">
+        <link rel="stylesheet" href="../resources/js/jquery-ui-1.12.1/jquery-ui.css">
+        <link rel="stylesheet" href="../resources/js/primeui-4.1.15/primeui.css">
+        <link rel="stylesheet" href="../resources/css/main.css">
+        <script type="text/javascript" src="../resources/js/jquery-3.2.0.js"></script>
         <script type="text/javascript" src="../resources/js/jquery-ui-1.12.1/jquery-ui.js"></script>
         <script type="text/javascript" src="../resources/js/primeui-4.1.15/primeui.min.js"></script>
-		<script type="text/javascript" src="../resources/js/x-tag-core.min.js"></script>
+        <script type="text/javascript" src="../resources/js/x-tag-core.min.js"></script>
         <script type="text/javascript" src="../resources/js/primeui-4.1.15/primeelements.js"></script>
-		<script type="text/javascript" src="../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
+        <script type="text/javascript" src="../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
         <script type="text/javascript" src="../resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
-			$(document).ready(function(){
-				$('#backButton').puibutton({
-					click: function(evt) {
-						$(this).hide();
-						window.location.href = "../"
-					}
-				});
-				
-				$.getJSON("services/get_clients.php", function(response) {
-				
-					if (response.success === true) {				
-						var items = [];
-						$.each(response.data, function(key, val) {
-							var name = val.NAME;
-							var idName = name + val.ID;
-							var desc = val.DESCRIPTION == null ? "Brak opisu" : val.DESCRIPTION;
-							var component = "<fieldset id=\"" + idName + "\" style=\"margin:20px\"><legend>" + name + "<\/legend>" + desc + "<\/fieldset>";
-							items.push(component);
-						});
-						
-						//ładowanie koponentów i ustawienie eventów
-						$("#mainDiv").append(items).children("fieldset").each(function() {
-							$(this).puifieldset();
-							$(this).children("legend").each(function() {
-								$(this).click(function(evt) {
-									window.location.href = this.innerText;
-								});
-								$(this).hover(function() {
-									$(this).css('cursor','pointer');
-								}, function() {
-									$(this).css('cursor','auto');
-								});
-							});
-						});
-					} else {
-						$('#mainDiv').puimessages({closable: false});
-						$('#mainDiv').puimessages('show', 'info', {summary: 'Brak klientów', detail: "" });
-					}
-				
-				}).fail(function(jqxhr, textStatus, error) {
-					var response = $(jqxhr.responseText).find("th:contains('Exception:')");
-					var message = response.length ? response[0].innerText : jqxhr.responseText;
-					$('#mainDiv').puimessages({closable: false});
-					$('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message });
-				});
-				
-				$('#left').puitabview({
-					orientation: 'left'
-				});
-			});
-		</script>
+            $(document).ready(function () {
+                $('#backButton').puibutton({
+                    click: function (evt) {
+                        $(this).hide();
+                        window.location.href = "../";
+                    }
+                });
+                $('#clientNamesContent').puifieldset();
+
+                $.getJSON("services/get_clients.php", function (response) {
+                    if (response.success === true) {
+                        var items = [];
+                        $.each(response.data, function (key, val) {
+                            var name = val.NAME;
+                            var idName = name + val.ID;
+                            var desc = val.DESCRIPTION ? val.DESCRIPTION : "Brak opisu.";
+                            var component = "<fieldset id=\"" + idName + "\" class=\"fieldsetRowClient\"><legend>" + name + "<\/legend>" + desc + "<\/fieldset>";
+                            items.push(component);
+                        });
+
+                        //ładowanie koponentów i ustawienie eventów
+                        $("#mainDiv").append(items).children("fieldset").each(function () {
+                            $(this).puifieldset();
+                            $(this).children("legend").each(function () {
+                                $(this).click(function (evt) {
+                                    window.location.href = this.innerText;
+                                });
+                                $(this).hover(function () {
+                                    $(this).css('cursor', 'pointer');
+                                }, function () {
+                                    $(this).css('cursor', 'auto');
+                                });
+                            });
+                        });
+                    } else {
+                        $('#mainDiv').puimessages({closable: false});
+                        $('#mainDiv').puimessages('show', 'info', {summary: 'Brak klientów', detail: ""});
+                    }
+
+                }).fail(function (jqxhr) {
+                    var response = $(jqxhr.responseText).find("th:contains('Exception:')");
+                    var message = response.length ? response[0].innerText : jqxhr.responseText;
+                    $('#mainDiv').puimessages({closable: false});
+                    $('#mainDiv').puimessages('show', 'error', {summary: 'Błąd', detail: message});
+                });
+
+                $('#left').puitabview({
+                    orientation: 'left'
+                });
+            });
+        </script>
     </head>
     <body>
-		<center>
-			<div id="left" class="mainTabView">
-				<ul>
-					<li><a href="#tab1">Klienci</a></li>
-				</ul>
-				<div>
-					<div id="tab1">
-						<div id="mainDiv">
-						</div>
-					</div>
-				</div>
-			</div>		
-			<div id="bottomButtonsDiv">
-				<button id="backButton" type="button">Powrót</button>
-			</div>
-		</center>
+        <div id="left" class="mainTabView">
+            <ul>
+                <li><a href="#tab1">Klienci</a></li>
+            </ul>
+            <div>
+                <div id="tab1">
+                    <fieldset id="clientNamesContent">
+                        <div id="mainDiv" class="mainContent mainContentClientList">
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>		
+        <div class="bottomButtonsDiv">
+            <button id="backButton" type="button">Powrót</button>
+        </div>
     </body>
 </html>

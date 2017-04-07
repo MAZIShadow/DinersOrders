@@ -3,64 +3,71 @@
     <head>
         <meta charset="UTF-8">
         <title>Obiady Snooker</title>
-		<link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.css">
-		<link rel="stylesheet" href="resources/js/jquery-ui-1.12.1/jquery-ui.css">
-		<link rel="stylesheet" href="resources/js/primeui-4.1.15/primeui.css">
-		<script type="text/javascript" src="resources/js/jquery-3.2.0.js"></script>
+        <link rel="stylesheet" type="text/css" href="resources/font-awesome-4.7.0/css/font-awesome.css">
+        <link rel="stylesheet" href="resources/js/jquery-ui-1.12.1/jquery-ui.css">
+        <link rel="stylesheet" href="resources/js/primeui-4.1.15/primeui.css">
+        <link rel="stylesheet" href="resources/css/main.css">
+        <script type="text/javascript" src="resources/js/jquery-3.2.0.js"></script>
         <script type="text/javascript" src="resources/js/jquery-ui-1.12.1/jquery-ui.js"></script>
         <script type="text/javascript" src="resources/js/primeui-4.1.15/primeui.min.js"></script>
-		<script type="text/javascript" src="resources/js/x-tag-core.min.js"></script>
+        <script type="text/javascript" src="resources/js/x-tag-core.min.js"></script>
         <script type="text/javascript" src="resources/js/primeui-4.1.15/primeelements.js"></script>
-		<script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
+        <script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
         <script type="text/javascript" src="resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
-			$(document).ready(function(){
-				$('#left').puitabview({
-					orientation: 'left'
-				});
-				
-				$('#loginButton').puibutton({
-					click: function(evt) {
-						$(this).hide();
-						window.location.href = "admin";
-					}
-				});
-				
-				$('#clientsButton').puibutton({
-					click: function(evt) {
-						$(this).hide();
-						window.location.href = "clients";
-					}
-				});
-			});
-		</script>
+            $(document).ready(function () {
+                $('#left').puitabview({
+                    orientation: 'left'
+                });
+                $('#clientFieldSet').puifieldset();
+                $('#clientsButton').puibutton({
+                    click: function (evt) {
+                        $(this).hide();
+                        window.location.href = "clients";
+                    }
+                });
+                $('#panelFieldSet').puifieldset();
+                $('#adminPanelButton').puibutton({
+                    click: function (evt) {
+                        $(this).hide();
+                        window.location.href = "admin";
+                    }
+                });
+            });
+        </script>
     </head>
     <body>
-		<center>
-			<div id="left" class="mainTabView">
-				<ul>
-					<li><a href="#tab1">Klienci</a></li>
-					<li><a href="#tab2">Panel</a></li>
-				</ul>
-				<div>
-					<div id="tab1">
-						<div>
-							Obiady dostarczamy dla wielu naszych klientów.
-						</div>
-						<div style="margin-top:20px">
-							<button id="clientsButton" type="button">Wejdź</button>
-						</div>
-					</div>
-					<div id="tab2">
-						<div>
-							Panel Administracyjny
-						</div>
-						<div style="margin-top:20px">
-							<button id="loginButton" type="button">Wejdź</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</center>
+        <div id="left" class="mainTabView">
+            <ul>
+                <li><a href="#tab1">Klienci</a></li>
+                <li><a href="#tab2">Panel</a></li>
+            </ul>
+            <div>
+                <div id="tab1">
+                    <fieldset id="clientFieldSet">
+                        <div class="mainContent mainContentCenter">
+                            <div>
+                                Obiady dostarczamy dla wielu naszych klientów.
+                            </div>
+                            <div class="enterButtonPanelCenter">
+                                <button id="clientsButton" type="button">Wejdź</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div id="tab2">
+                    <fieldset id="panelFieldSet">
+                        <div class="mainContent mainContentCenter">
+                            <div>
+                                Panel Administracyjny
+                            </div>
+                            <div class="enterButtonPanelCenter">
+                                <button id="adminPanelButton" type="button">Wejdź</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

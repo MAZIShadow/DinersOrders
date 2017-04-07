@@ -3,156 +3,151 @@
     <head>
         <meta charset="UTF-8">
         <title>Lista zamównień</title>
-		<link rel="stylesheet" type="text/css" href="../../../resources/font-awesome-4.7.0/css/font-awesome.css">
-		<link rel="stylesheet" href="../../../resources/js/jquery-ui-1.12.1/jquery-ui.css">
-		<link rel="stylesheet" href="../../../resources/js/primeui-4.1.15/primeui.css">
-		<script type="text/javascript" src="../../../resources/js/jquery-3.2.0.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../resources/font-awesome-4.7.0/css/font-awesome.css">
+        <link rel="stylesheet" href="../../../resources/js/jquery-ui-1.12.1/jquery-ui.css">
+        <link rel="stylesheet" href="../../../resources/js/primeui-4.1.15/primeui.css">
+        <link rel="stylesheet" href="../../../resources/css/main.css">
+        <script type="text/javascript" src="../../../resources/js/jquery-3.2.0.js"></script>
         <script type="text/javascript" src="../../../resources/js/jquery-ui-1.12.1/jquery-ui.js"></script>
         <script type="text/javascript" src="../../../resources/js/primeui-4.1.15/primeui.min.js"></script>
-		<script type="text/javascript" src="../../../resources/js/x-tag-core.min.js"></script>
+        <script type="text/javascript" src="../../../resources/js/x-tag-core.min.js"></script>
         <script type="text/javascript" src="../../../resources/js/primeui-4.1.15/primeelements.js"></script>
-		<script type="text/javascript" src="../../../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
+        <script type="text/javascript" src="../../../resources/js/primeui-4.1.15/plugins/plugins-all.js"></script>
         <script type="text/javascript" src="../../../resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
-			$(document).ready(function(){
-				$('#messages').puigrowl({life:3000});
-						
-				$('#backButton').puibutton({
-					click: function(evt) {
-						$(this).hide();
-						window.location.href = "../"
-					}
-				});
-				
-				$('#btnSaveOrder').puibutton();
-				
-				$('#left').puitabview({
-					orientation: 'left'
-				});
-				
-				<!-- zamówienie -->
-				$('#user_name').puiinputtext();
-				
-				$('#meal_id').puidropdown({
-					data:  function(callback) {
-						$.ajax({
-							type: "GET",
-							url: '../../services/get_dinners_today.php',
-							dataType: "json",
-							context: this,
-							success: function(response) {
-								var items = [];
-							
-								if (response.success === true) {
-									$.each(response.data, function(key, val) {
-										var item = new Object();
-										item.label = val.NAME;
-										item.value = val.ID;
-										items.push(item);
-									});
-								} else {
-									var item = new Object();
-									item.label = 'Brak danych';
-									item.value = -1;
-									items.push(item);
-									$('#btnSaveOrder').hide();
-								}
-								
-								callback.call(this, items);
-							}
-						});
-					}
-				});
-				
-				$('#meal_amount').puispinner({
-					min:1,
-					max:5
-				});
-				
-				$('#order_form').submit(function(event) {
-					var result = $("#order_form")[0].checkValidity();
-					
-					if (result) {
-						$('#btnSaveOrder').hide();
-						var product = $('#order_form').serializeArray();
-						
-						$.ajax({
-							type: "POST",
-							url: "services/save_order_data.php",
-							data: product,
-							dataType: "json",
-							context: this,
-							success: function(response) {
-								var summaryMsg = response.action === 'new' ? 'Zapis posiłku' : 'Aktualizacja posiłku';
-							
-								if (response.success === true) {
-									$('#messages').puigrowl('show', [{severity:'info', summary: summaryMsg, detail: response.msg}]);
-									window.location.href = "../";
-								} else {
-									$('#messages').puigrowl('show', [{severity:'error', summary: summaryMsg, detail: response.msg}]);
-								}
-							},
-							error: function(response) {
-								$('#messages').puigrowl('show', [{severity:'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
-							}
-						});
-					}
-					event.preventDefault();
-				});
-			});
-		</script>
+            $(document).ready(function () {
+                $('#messages').puigrowl({life: 3000});
+                $('#backButton').puibutton({
+                    click: function (evt) {
+                        $(this).hide();
+                        window.location.href = "../";
+                    }
+                });
+
+                $('#left').puitabview({
+                    orientation: 'left'
+                });
+
+                // form_order
+                $('#btnSaveOrder').puibutton();
+                $('#orderMealsTopButtons').puifieldset();
+                $('#orderFormTopButtons').puifieldset();
+                $('#user_name').puiinputtext();
+                $('#meal_id').puidropdown({
+                    data: function (callback) {
+                        $.ajax({
+                            type: "GET",
+                            url: '../../services/get_dinners_today.php',
+                            dataType: "json",
+                            context: this,
+                            success: function (response) {
+                                var items = [];
+                                if (response.success === true) {
+                                    $.each(response.data, function (key, val) {
+                                        var item = new Object();
+                                        item.label = val.NAME;
+                                        item.value = val.ID;
+                                        items.push(item);
+                                    });
+                                } else {
+                                    var item = new Object();
+                                    item.label = 'Brak danych';
+                                    item.value = -1;
+                                    items.push(item);
+                                    $('#orderMealsTopButtons').hide();
+                                }
+
+                                callback.call(this, items);
+                            }
+                        });
+                    }
+                });
+                $('#meal_amount').puispinner({
+                    min: 1,
+                    max: 5
+                });
+                $('#order_form').submit(function (event) {
+                    var result = $("#order_form")[0].checkValidity();
+                    
+                    if (result) {
+                        $('#btnSaveOrder').hide();
+                        var product = $('#order_form').serializeArray();
+                        $.ajax({
+                            type: "POST",
+                            url: "services/save_order_data.php",
+                            data: product,
+                            dataType: "json",
+                            context: this,
+                            success: function (response) {
+                                var summaryMsg = response.action === 'new' ? 'Zapis posiłku' : 'Aktualizacja posiłku';
+                                
+                                if (response.success === true) {
+                                    $('#messages').puigrowl('show', [{severity: 'info', summary: summaryMsg, detail: response.msg}]);
+                                    window.location.href = "../";
+                                } else {
+                                    $('#messages').puigrowl('show', [{severity: 'error', summary: summaryMsg, detail: response.msg}]);
+                                }
+                            },
+                            error: function (response) {
+                                $('#messages').puigrowl('show', [{severity: 'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
+                            }
+                        });
+                    }
+                    event.preventDefault();
+                });
+            });
+        </script>
     </head>
     <body>
-		<div id="messages"></div>
-		<center>
-			<div id="topButtonsDiv">
-			</div>
-			<div id="left" class="mainTabView">
-				<ul>
-					<li><a href="#tab1">Zamówienie</a></li>
-				</ul>
-				<div>
-					<div id="tab1">
-						<form id="order_form">
-							<div id="topButtonsDiv">
-								<button id="btnSaveOrder" type="submit">Złóż zamówienie</button>
-							</div>
-							<div id="mainDiv" style="text-align: left; padding: 10px">
-								<div class="ui-grid ui-grid-responsive">
-									<div class="ui-grid-row">
-										<div class="ui-grid-col-3">
-											<label class="required">Podaj imię:</label>
-										</div>
-										<div class="ui-grid-col-3">
-											<input name="user_name" maxlength="250" type="text" required />
-										</div>
-									</div>
-									<div class="ui-grid-row">
-										<div class="ui-grid-col-3">
-											<label class="required">Zamówienie:</label>
-										</div>
-										<div class="ui-grid-col-3">
-											<select id="meal_id" name="meal_id" required>
-											</select>
-										</div>
-									</div>
-									<div class="ui-grid-row">
-										<div class="ui-grid-col-3">
-											<label class="required">Ilość:</label>
-										</div>
-										<div class="ui-grid-col-3">
-											<input id="meal_amount" name="meal_amount" type="text" value="1" required/>
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<div id="bottomButtonsDiv">
-				<button id="backButton" type="button">Powrót</button>
-			</div>
-		</center>
+        <div id="messages"></div>
+
+        <div id="left" class="mainTabView">
+            <ul>
+                <li><a href="#tab1">Zamówienie</a></li>
+            </ul>
+            <div>
+                <div id="tab1">
+                    <form id="order_form">
+                        <fieldset id="orderMealsTopButtons" class="fieldsetTopRightButtons">
+                            <button id="btnSaveOrder" type="submit">Złóż zamówienie</button>
+                        </fieldset>    
+                        <fieldset id="orderFormTopButtons" class="mainContent">
+                            <div class="ui-grid ui-grid-responsive">
+                                <div class="ui-grid-row">
+                                    <div class="ui-grid-col-3">
+                                        <label class="required">Podaj imię:</label>
+                                    </div>
+                                    <div class="ui-grid-col-3">
+                                        <input id="user_name" name="user_name" maxlength="250" type="text" required />
+                                    </div>
+                                </div>
+                                <div class="ui-grid-row ui-grid-row-ext">
+                                    <div class="ui-grid-col-3">
+                                        <label class="required">Zamówienie:</label>
+                                    </div>
+                                    <div class="ui-grid-col-3">
+                                        <select id="meal_id" name="meal_id" required>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="ui-grid-row ui-grid-row-ext">
+                                    <div class="ui-grid-col-3">
+                                        <label class="required">Ilość:</label>
+                                    </div>
+                                    <div class="ui-grid-col-3">
+                                        <input id="meal_amount" name="meal_amount" type="text" value="1" required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- backbutton -->
+        <div class="bottomButtonsDiv">
+            <button id="backButton" type="button">Powrót</button>
+        </div>
     </body>
 </html>
