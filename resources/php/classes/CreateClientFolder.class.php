@@ -8,7 +8,8 @@ class CreateClientFolder {
     private $dest = '';
     private $clientName = '';
     private $clientPass = '';
-	const WWW_WEBPAGE = '/DinersOrders/clients/';
+
+    const WWW_WEBPAGE = '/DinersOrders/clients/';
 
     public function __construct($src, $dest, $clientName, $clientPass) {
         $this->src = $src;
@@ -25,7 +26,7 @@ class CreateClientFolder {
             $this->createHtAccess();
             $tempIndex = $this->dest . "/index.html";
             unlink($tempIndex);
-            rename($this->dest . "/tempindex.html", $tempIndex);
+            rename($this->dest . "/tempIndex.html", $tempIndex);
 
             return true;
         }
@@ -85,5 +86,7 @@ class CreateClientFolder {
 
         return true;
     }
+    
 }
+
 ?>
