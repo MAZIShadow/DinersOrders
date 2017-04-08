@@ -16,7 +16,29 @@
         <script type="text/javascript" src="../../resources/js/primeui-4.1.15/plugins/mustache.min.js"></script>
         <script type="text/javascript">
 
+            function checkTimeOrder(functionParam) {
+                $.getJSON("services/get_order_date_limit.php", function (response) {
+                    if (response.success !== true) {
+                        $('#orderTopButtons').hide();
+                        $('#messageDiv').puimessages({closable: false});
+                        $('#messageDiv').puimessages('show', 'info', {summary: 'Przykro mi dziś już nie można zamówić.', detail: ''});
+                    } else {
+                        if (functionParam) {
+                            functionParam();
+                        }
+                    }
+                });
+            }
+
+            function gotoOrder() {
+                $('#orderButton').hide();
+                window.location.href = "order";
+            }
+
             function loadData() {
+
+                checkTimeOrder();
+                
                 $.getJSON("services/get_orders_today.php", function (response) {
 
                     if (response.success === true) {
@@ -76,8 +98,7 @@
                 $('#orderTopButtons').puifieldset();
                 $('#orderButton').puibutton({
                     click: function (evt) {
-                        $(this).hide();
-                        window.location.href = "order";
+                        checkTimeOrder(gotoOrder);
                     }
                 });
 
@@ -106,6 +127,8 @@
                         <button id="orderButton" type="button">Zamów</button>
                         <button id="deleteButton" type="button" style="display:none">Usuń zamówienie</button>
                     </fieldset>
+                    <div id="messageDiv">
+                    </div>
                     <div id="mainDiv">
                     </div>
                 </div>
