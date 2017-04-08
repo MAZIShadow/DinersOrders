@@ -1,9 +1,9 @@
 <?php
-require_once("../../resources/php/classes/MySqlDBConnection.class.php");
-$db_handle = new MySqlDBConnection();
+require_once("../../resources/php/classes/MySQLDBConnection.class.php");
+$db_handle = new MySQLDBConnection();
 $result["total"] = 0;
 $result["success"] = false;
-$queryStr = sprintf('SELECT * FROM %1$s.client', $db_handle->dbName);
+$queryStr = sprintf('SELECT * FROM %1$s.client', MySQLDBConnection::DB_NAME);
 $rs = $db_handle->runQuery($queryStr);
 
 if ($rs != null) {	

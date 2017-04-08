@@ -1,11 +1,11 @@
 <?php
-require_once("../../resources/php/classes/MySqlDBConnection.class.php");
-$db_handle = new MySqlDBConnection();
+require_once("../../resources/php/classes/MySQLDBConnection.class.php");
+$db_handle = new MySQLDBConnection();
 $result = false;
 $meal_id = intval($_REQUEST['meal_id']);
 $meal_name = filter_var($_REQUEST['meal_name'], FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 $error_msg = 'Nastąpił nieoczekiwany błąd podczas usuwania!';
-$queryStr = sprintf('DELETE FROM %1$s.DINNER WHERE ID = ?', $db_handle->dbName);
+$queryStr = sprintf('DELETE FROM %1$s.dinner WHERE ID = ?', MySQLDBConnection::DB_NAME);
 $stmt = $db_handle->prepareQuery($queryStr);
 $stmt->bind_param("i", $meal_id);
 $success_msg = 'Usunięto posiłek [' . trim($meal_name) . '].';

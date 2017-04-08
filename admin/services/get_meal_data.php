@@ -1,10 +1,10 @@
 <?php
 $date = isset($_GET['date']) ? $_GET['date'] : ''; 
-require_once("../../resources/php/classes/MySqlDBConnection.class.php");
-$db_handle = new MySqlDBConnection();
+require_once("../../resources/php/classes/MySQLDBConnection.class.php");
+$db_handle = new MySQLDBConnection();
 $result["total"] = 0;
 $result["success"] = false;
-$queryStr = sprintf('SELECT d.id id, d.name name, SUM(o.AMOUNT) count FROM %1$s.dinner d LEFT JOIN %1$s.order o ON d.ID = o.DINNER_ID WHERE d.DATE = ? GROUP BY d.ID, d.NAME', $db_handle->dbName);
+$queryStr = sprintf('SELECT d.ID id, d.NAME name, SUM(o.AMOUNT) count FROM %1$s.dinner d LEFT JOIN %1$s.order o ON d.ID = o.DINNER_ID WHERE d.DATE = ? GROUP BY d.ID, d.NAME', MySQLDBConnection::DB_NAME);
 $params = array("s", $date);
 $rs = $db_handle->runPreparedQuery($queryStr, $params);
 

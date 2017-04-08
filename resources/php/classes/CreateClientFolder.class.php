@@ -4,10 +4,11 @@ require_once("HtPasswordGenerate.php");
 
 class CreateClientFolder {
 
-    private $src = "";
-    private $dest = "";
-    private $clientName = "";
-    private $clientPass = "";
+    private $src = '';
+    private $dest = '';
+    private $clientName = '';
+    private $clientPass = '';
+	const WWW_WEBPAGE = '/DinersOrders/clients/';
 
     public function __construct($src, $dest, $clientName, $clientPass) {
         $this->src = $src;
@@ -38,7 +39,7 @@ class CreateClientFolder {
         $file = fopen($this->dest . "/order/.htaccess", "a");
         fwrite($file, 'AuthType Basic' . PHP_EOL);
         fwrite($file, 'AuthName "Panel zamówienia"' . PHP_EOL);
-        fwrite($file, 'AuthUserFile \'' . $_SERVER['DOCUMENT_ROOT'] . 'DinersOrders/clients/' . $this->clientName . '/.htpasswd\'' . PHP_EOL);
+        fwrite($file, 'AuthUserFile \'' . $_SERVER['DOCUMENT_ROOT'] . CreateClientFolder::WWW_WEBPAGE . $this->clientName . '/.htpasswd\'' . PHP_EOL);
         fwrite($file, 'Require user ' . $loginClientName . PHP_EOL);
         fclose($file);
 

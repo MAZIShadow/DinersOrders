@@ -2,10 +2,10 @@
 
 class MySQLDBConnection {
 
-    private $dbHost = "localhost";
-    private $dbLogin = "root";
-    private $dbPassword = "";
-    public $dbName = "homemeals";
+    const DB_HOST = 'localhost';
+    const DB_LOGIN = 'root';
+    const DB_PASSWORD = '';
+    const DB_NAME = 'homemeals';
     private $mysqli = NULL;
 
     public function __construct() {
@@ -13,7 +13,7 @@ class MySQLDBConnection {
     }
 
     public function connectDB() {
-        $this->mysqli = new mysqli($this->dbHost, $this->dbLogin, $this->dbPassword, $this->dbName);
+        $this->mysqli = new mysqli(MySQLDBConnection::DB_HOST, MySQLDBConnection::DB_LOGIN, MySQLDBConnection::DB_PASSWORD, MySQLDBConnection::DB_NAME);
 
         if ($this->mysqli->connect_errno > 0) {
             die('Could not connect: ' . $this->mysqli->connect_error);

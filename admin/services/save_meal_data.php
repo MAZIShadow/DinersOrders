@@ -1,6 +1,6 @@
 <?php
-require_once("../../resources/php/classes/MySqlDBConnection.class.php");
-$db_handle = new MySqlDBConnection();
+require_once("../../resources/php/classes/MySQLDBConnection.class.php");
+$db_handle = new MySQLDBConnection();
 $result = false;
 $meal_id = intval($_REQUEST['meal_id']);
 $meal_name = filter_var($_REQUEST['meal_name'], FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
@@ -9,12 +9,12 @@ $action = $meal_id === -1 ? 'new' : 'update';
 $error_msg = 'Nastąpił nieoczekiwany błąd podczas zapisu!';
 
 if ($action === 'new') {
-    $queryStr = sprintf('INSERT INTO %1$s.DINNER (name, date) VALUES (?,?)', $db_handle->dbName);
+    $queryStr = sprintf('INSERT INTO %1$s.dinner (NAME, DATE) VALUES (?,?)', MySQLDBConnection::DB_NAME);
 	$stmt = $db_handle->prepareQuery($queryStr);
 	$stmt->bind_param("ss", $meal_name, $meal_date);
     $success_msg = 'Posiłek [' . $meal_name . '] został dodany.';
 } else {
-    $queryStr = sprintf('UPDATE %1$s.DINNER set name = ? WHERE id = ?', $db_handle->dbName);
+    $queryStr = sprintf('UPDATE %1$s.dinner SET NAME = ? WHERE ID = ?', MySQLDBConnection::DB_NAME);
 	$stmt = $db_handle->prepareQuery($queryStr);
 	$stmt->bind_param("si", $meal_name, $meal_id);
 	$success_msg = 'Posiłek [' . $meal_name . '] został zaktualizowany.';
