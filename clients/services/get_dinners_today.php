@@ -2,7 +2,7 @@
 require_once("../../resources/php/classes/MySQLDBConnection.class.php");
 $dateToday = date('Y-m-d');
 $db_handle = new MySQLDBConnection();
-$query = sprintf('SELECT * FROM %1$s.DINNER WHERE DATE = ?', MySQLDBConnection::DB_NAME);
+$query = sprintf('SELECT * FROM %1$s.dinner WHERE DATE = ?', MySQLDBConnection::DB_NAME);
 $params = array("s", $dateToday);
 $result = $db_handle->runPreparedQuery($query, $params);
 $resultset['success'] = false;

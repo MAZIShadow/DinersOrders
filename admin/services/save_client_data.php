@@ -19,7 +19,7 @@ if ($client_name && $client_pass) {
     } else {
         if ($action === 'new') {
             $todaysEndDate = new DateTime('today');
-            $todaysEndDate->setTime(11, 35, 00);
+            $todaysEndDate->setTime(21, 50, 00);
             $format_date = 'Y-m-d H:i:s';
             $dateToday = $todaysEndDate->format($format_date);
             $queryStr = sprintf('INSERT INTO %1$s.client (NAME, DESCRIPTION, ORDER_TIME_LIMIT) VALUES (?,?,?)', MySQLDBConnection::DB_NAME);
