@@ -212,6 +212,22 @@
                         $('#remove_dialog_client #bt_remove_no').focus();
                     }
                 });
+                $('#clientTopButtons #gotoClientButton').puibutton({
+                    icon: ' ui-icon-arrow-1-e'
+                }).focus().click(function () {
+                    var selections = $('#clientTableGrid').puidatatable('getSelection');
+
+                    if (selections.length === 1) {
+                        var selection = selections[0];
+
+                        if (selection.ID < 0) {
+                            return;
+                        }
+
+                        window.location.href = selection.URL;
+                    }
+                });
+                
                 $('#contentClient').puifieldset();
                 $('#contentClient #clientTableGrid').puidatatable({
                     caption: null,
@@ -231,7 +247,24 @@
                             dataType: "json",
                             context: this,
                             success: function (response) {
-                                callback.call(this, response.rows);
+                                
+                                if (response.success === true) {
+                                    var array = new Array();
+                                    var url = window.location.href.substring(0, window.location.href.lastIndexOf("/admin"));
+                                    
+                                    $.each(response.rows, function (key, val) {
+                                        var newRow = new Object();
+                                        newRow.ID = val.ID;
+                                        newRow.NAME = val.NAME;
+                                        newRow.DESCRIPTION = val.DESCRIPTION;
+                                        newRow.URL = url + '/clients/' + val.NAME.toLowerCase();
+                                        array.push(newRow);
+                                    });
+                                    
+                                    callback.call(this, array);
+                                } else {
+                                    callback.call(this, response.rows);
+                                }
                             },
                             error: function (response) {
                                 alert('error');
