@@ -20,12 +20,6 @@
                     orientation: 'left'
                 });
                 $('#clientFieldSet').puifieldset();
-                $('#clientsButton').puibutton({
-                    click: function (evt) {
-                        $(this).hide();
-                        window.location.href = "clients";
-                    }
-                });
                 $('#panelFieldSet').puifieldset();
                 $('#adminPanelButton').puibutton({
                     click: function (evt) {
@@ -48,9 +42,6 @@
                         <div class="mainContent mainContentCenter">
                             <div>
                                 Obiady dostarczamy dla wielu naszych klientów.
-                            </div>
-                            <div class="enterButtonPanelCenter">
-                                <button id="clientsButton" type="button">Wejdź</button>
                             </div>
                         </div>
                     </fieldset>

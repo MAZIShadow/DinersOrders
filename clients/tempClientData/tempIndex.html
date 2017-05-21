@@ -101,6 +101,12 @@
                         $(this).hide();
                     }
                 });
+				
+				$('#simpleViewButton').puibutton({
+                    click: function (evt) {
+						window.open(window.location.href + 'simpleView', '_blank');
+                    }
+                });
 
                 $('#left').puitabview({
                     orientation: 'left'
@@ -120,6 +126,7 @@
                     <fieldset id="orderTopButtons" class="fieldsetTopRightButtons">
                         <button id="orderButton" type="button">Zamów</button>
                         <button id="deleteButton" type="button" style="display:none">Usuń zamówienie</button>
+						<button id="simpleViewButton" type="button" style="float: right">Prosty widok</button>
                     </fieldset>
                     <div id="messageDiv">
                     </div>
