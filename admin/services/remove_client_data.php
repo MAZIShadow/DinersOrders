@@ -1,4 +1,5 @@
 <?php
+
 require_once("../../resources/php/classes/MySQLDBConnection.class.php");
 require_once("../../resources/php/classes/DropClientFolder.class.php");
 $db_handle = new MySQLDBConnection();
@@ -14,16 +15,16 @@ $result = $stmt->execute();
 $stmt->close();
 $jsonResult = null;
 
-if ($result){
-	$src = sprintf('../../clients/%s',$client_name);
-	$dropClient = new DropClientFolder($src, $client_name);
-	$dropClient->dropClient();
-    $jsonResult = array('action'=>'delete','success'=>true,'msg'=>$success_msg);
-	$db_handle->commit();
+if ($result) {
+    $src = sprintf('../../clients/%s', $client_name);
+    $dropClient = new DropClientFolder($src, $client_name);
+    $dropClient->dropClient();
+    $jsonResult = array('action' => 'delete', 'success' => true, 'msg' => $success_msg);
+    $db_handle->commit();
 } else {
-    $jsonResult = array('action'=>'delete','success'=>false,'msg'=>$error_msg);
-	$db_handle->rollback();
+    $jsonResult = array('action' => 'delete', 'success' => false, 'msg' => $error_msg);
+    $db_handle->rollback();
 }
 
-echo json_encode($jsonResult); 
+echo json_encode($jsonResult);
 ?>
