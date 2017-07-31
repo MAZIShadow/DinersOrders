@@ -1,12 +1,10 @@
 <?php
 
-require_once("../../../resources/php/classes/MySQLDBConnection.class.php");
+require_once("../../../resources/php/classes/ClientRepository.class.php");
 require_once("../config/clientData.php");
 
-$db_handle = new MySQLDBConnection();
-$queryClient = sprintf('SELECT ID, ORDER_TIME_LIMIT FROM %1$s.client WHERE NAME = ?', MySQLDBConnection::DB_NAME);
-$params = array("s", $clientName);
-$resultQuery = $db_handle->runPreparedQuery($queryClient, $params);
+$clientRepo = new ClientRepository();
+$resultQuery = $clientRepo->getClientByName($clientName);
 $format = "H:i:s";
 $serverTime = new DateTime('now');
 $serverTimeStr = $serverTime->format($format);

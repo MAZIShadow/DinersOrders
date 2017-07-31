@@ -1,10 +1,9 @@
 <?php
-require_once("../../resources/php/classes/MySQLDBConnection.class.php");
-$db_handle = new MySQLDBConnection();
+require_once("../../resources/php/classes/ClientRepository.class.php");
+$clientRepo = new ClientRepository();
 $result['success'] = false;
 $result['data'] = null;
-
-$queryResult = $db_handle->runQuery(sprintf('SELECT * FROM %s.client', MySQLDBConnection::DB_NAME));
+$queryResult = $clientRepo->getAllClients();
 
 if ($queryResult != null) {
 	$result['success'] = true;

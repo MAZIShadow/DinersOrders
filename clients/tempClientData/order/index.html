@@ -45,8 +45,8 @@
                                 if (response.success === true) {
                                     $.each(response.data, function (key, val) {
                                         var item = new Object();
-                                        item.label = val.NAME;
-                                        item.value = val.ID;
+                                        item.label = val.dinner_name;
+                                        item.value = val.dinner_id;
                                         items.push(item);
                                     });
                                 } else {
@@ -68,7 +68,7 @@
                 });
                 $('#order_form').submit(function (event) {
                     var result = $("#order_form")[0].checkValidity();
-                    
+
                     if (result) {
                         $('#btnSaveOrder').hide();
                         var product = $('#order_form').serializeArray();
@@ -80,7 +80,7 @@
                             context: this,
                             success: function (response) {
                                 var summaryMsg = response.action === 'new' ? 'Zapis posiłku' : 'Aktualizacja posiłku';
-                                
+
                                 if (response.success === true) {
                                     $('#messages').puigrowl('show', [{severity: 'info', summary: summaryMsg, detail: response.msg}]);
                                     window.location.href = "../";

@@ -20,6 +20,14 @@ class MenuRepository {
         return $db_handle->runPreparedQuery($query, $params);
     }
 
+    public function getDinnersForOrderBetweenDates($startDateTime, $endDateTime) {
+        $db_handle = new MySQLDBConnection();
+        $query = sprintf('SELECT M.ID id, D.NAME FROM %1$s.menu M LEFT JOIN %1$s.dinner D ON D.ID = M.DINNER_ID WHERE M.DATE BETWEEN ? AND ?', MySQLDBConnection::DB_NAME);
+        $params = array("ss", $startDateTime, $endDateTime);
+
+        return $db_handle->runPreparedQuery($query, $params);
+    }
+
     public function saveMenu($dinnerId, $menu_date, $numberOfPortions) {
         $db_handle = new MySQLDBConnection();
         $query = sprintf('INSERT INTO %1$s.menu (DINNER_ID, DATE, NUMBER_OF_PORTIONS) VALUES (?,?,?)', MySQLDBConnection::DB_NAME);

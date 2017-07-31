@@ -38,7 +38,7 @@
             function loadData() {
 
                 checkTimeOrder();
-                
+
                 $.getJSON("services/get_orders_today.php", function (response) {
 
                     if (response.success === true) {
@@ -101,10 +101,10 @@
                         $(this).hide();
                     }
                 });
-				
-				$('#simpleViewButton').puibutton({
+
+                $('#simpleViewButton').puibutton({
                     click: function (evt) {
-						window.open(window.location.href + 'simpleView', '_blank');
+                        window.open(window.location.href + 'simpleView', '_blank');
                     }
                 });
 
@@ -126,7 +126,7 @@
                     <fieldset id="orderTopButtons" class="fieldsetTopRightButtons">
                         <button id="orderButton" type="button">Zamów</button>
                         <button id="deleteButton" type="button" style="display:none">Usuń zamówienie</button>
-						<button id="simpleViewButton" type="button" style="float: right">Prosty widok</button>
+                        <button id="simpleViewButton" type="button" style="float: right">Prosty widok</button>
                     </fieldset>
                     <div id="messageDiv">
                     </div>
