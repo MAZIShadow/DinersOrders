@@ -27,17 +27,7 @@ if ($action === 'new') {
         if ($clientTimeStr < $serverTimeStr) {
             $error_msg = "Przekroczenie czasu zamówienia!";
         } else {
-            $result = true;
-            $queryStr = sprintf('INSERT INTO %1$s.order (NAME, DATE, AMOUNT, DINNER_ID, CLIENT_ID) VALUES (?,?,?,?,?)', MySQLDBConnection::DB_NAME);
-
-            foreach ($resultQuery as $row) {
-                $clientId = $row['ID'];
-                $stmt = $db_handle->prepareQuery($queryStr);
-                $stmt->bind_param("ssiii", $meal_name, $meal_date, $meal_amount, $meal_id, $clientId);
-                $stmt->execute();
-                $stmt->close();
-            }
-
+            $result = $orderRepo->saveOrder($user_name, $menu_id, $meal_amount, $resultRow['clientId']);
             $success_msg = 'Zamówienie złożone.';
         }
     } else {
@@ -47,5 +37,6 @@ if ($action === 'new') {
     $error_msg = "Nieprawłowe żadanie!";
 }
 
+$jsonResult = array('action' => $action, 'success' => $result, 'msg' => $result ? $success_msg : $error_msg);
 echo json_encode($jsonResult);
 ?>
