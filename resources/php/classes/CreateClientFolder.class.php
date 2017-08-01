@@ -33,7 +33,7 @@ class CreateClientFolder {
     }
 
     private function createHtAccess() {
-
+        return;
         $loginClientName = strtolower(preg_replace('/\s+/', '', $this->clientName));
         $file = fopen($this->dest . "/order/.htaccess", "a");
         fwrite($file, 'AuthType Basic' . PHP_EOL);

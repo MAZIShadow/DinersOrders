@@ -1,29 +1,29 @@
 <?php
 
-require_once("../../../../resources/php/classes/MySQLDBConnection.class.php");
+require_once("../../../../resources/php/classes/ClientRepository.class.php");
+require_once("../../../../resources/php/classes/OrderRepository.class.php");
+require_once("../../../../resources/php/classes/Consts.php");
 require_once("../../config/clientData.php");
 
-$db_handle = new MySQLDBConnection();
-$meal_id = intval($_REQUEST['meal_id']);
-$meal_name = filter_var($_REQUEST['user_name'], FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+$clientRepo = new ClientRepository();
+$orderRepo = new OrderRepository();
+$menu_id = intval($_REQUEST['menu_id']);
+$user_name = filter_var($_REQUEST['user_name'], FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 $meal_amount = intval($_REQUEST['meal_amount']);
-$meal_date = date('Y-m-d  H:i:s');
-$action = $meal_id === -1 ? 'error' : 'new';
+$meal_date = date(Consts::FULL_DATE_FORMAT);
+$action = $menu_id === -1 ? 'error' : 'new';
 $error_msg = 'Nastąpił nieoczekiwany błąd podczas zapisu!';
 $result = false;
 
 if ($action === 'new') {
-    $queryClient = sprintf('SELECT ID, ORDER_TIME_LIMIT FROM %1$s.client WHERE NAME = ?', MySQLDBConnection::DB_NAME);
-    $params = array("s", $clientName);
-    $resultQuery = $db_handle->runPreparedQuery($queryClient, $params);
+    $resultRow = $clientRepo->getOrderTimeLimitByClientName($clientName);
 
-    if ($resultQuery != null) {
-        $format = "H:i:s";
+    if ($resultRow != null) {
         $serverTime = new DateTime('now');
-        $serverTimeStr = $serverTime->format($format);
-        $clientTime = new DateTime($resultQuery[0]['ORDER_TIME_LIMIT']);        
-        $clientTimeStr = $clientTime->format($format);
-        
+        $serverTimeStr = $serverTime->format(Consts::HOUR_DATE_FORMAT);
+        $clientTime = $resultRow['orderTimeLimit'];
+        $clientTimeStr = $clientTime->format(Consts::HOUR_DATE_FORMAT);
+
         if ($clientTimeStr < $serverTimeStr) {
             $error_msg = "Przekroczenie czasu zamówienia!";
         } else {
@@ -45,14 +45,6 @@ if ($action === 'new') {
     }
 } else {
     $error_msg = "Nieprawłowe żadanie!";
-}
-
-if ($result) {
-    $jsonResult = array('action' => $action, 'success' => true, 'msg' => $success_msg);
-    $db_handle->commit();
-} else {
-    $jsonResult = array('action' => $action, 'success' => false, 'msg' => $error_msg);
-    $db_handle->rollback();
 }
 
 echo json_encode($jsonResult);
