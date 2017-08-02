@@ -1,30 +1,21 @@
 <?php
 
-require_once("../../resources/php/classes/MySQLDBConnection.class.php");
+require_once("../../resources/php/classes/ClientRepository.class.php");
 require_once("../../resources/php/classes/DropClientFolder.class.php");
-$db_handle = new MySQLDBConnection();
+$clientRepo = new ClientRepository();
 $result = false;
 $client_id = intval($_REQUEST['client_id']);
 $client_name = filter_var($_REQUEST['client_name'], FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 $error_msg = 'Nastąpił nieoczekiwany błąd podczas usuwania!';
-$queryStr = sprintf('DELETE FROM %1$s.client WHERE ID = ?', MySQLDBConnection::DB_NAME);
-$stmt = $db_handle->prepareQuery($queryStr);
-$stmt->bind_param("i", $client_id);
 $success_msg = 'Usunięto klienta [' . trim($client_name) . '].';
-$result = $stmt->execute();
-$stmt->close();
-$jsonResult = null;
+$result = $clientRepo->removeClientById($client_id);
 
 if ($result) {
     $src = sprintf('../../clients/%s', $client_name);
     $dropClient = new DropClientFolder($src, $client_name);
     $dropClient->dropClient();
-    $jsonResult = array('action' => 'delete', 'success' => true, 'msg' => $success_msg);
-    $db_handle->commit();
-} else {
-    $jsonResult = array('action' => 'delete', 'success' => false, 'msg' => $error_msg);
-    $db_handle->rollback();
 }
 
+$jsonResult = array('action' => 'delete', 'success' => $result, 'msg' => $result ? $success_msg : $error_msg);
 echo json_encode($jsonResult);
 ?>

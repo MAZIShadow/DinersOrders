@@ -2,6 +2,7 @@
 
 require_once("../../../../resources/php/classes/ClientRepository.class.php");
 require_once("../../../../resources/php/classes/OrderRepository.class.php");
+require_once("../../../../resources/php/classes/MenuRepository.class.php");
 require_once("../../../../resources/php/classes/Consts.php");
 require_once("../../config/clientData.php");
 

@@ -37,6 +37,7 @@
                     change: function (event, ui) {
                         $('#tableGrid').puidatatable('reload');
                         $('#clientTableGrid').puidatatable('reload');
+                        $('#dinnerTableGrid').puidatatable('reload');
                     }
                 });
                 $('#backButton').puibutton({
@@ -57,6 +58,7 @@
                     $("input[name='menu_id']").val(-1);
                     $("input[name='menu_date']").val(globalDate);
                     $('#edit_dialog_menu').puidialog('show');
+                    initDinnerMenuGrid();
                 });
                 $('#menuTopButtons #deleteMenuButton').puibutton({
                     icon: 'ui-icon-circle-minus'
@@ -69,6 +71,7 @@
                         if (selection.id < 0) {
                             return;
                         }
+
 
                         $('#remove_dialog_menu_label').text('Usuń posiłek: ' + selection.dinner_name);
                         $('#remove_dialog_menu').puidialog('show');
@@ -107,42 +110,10 @@
                     }
                 });
                 $('#contentMenu').puifieldset();
-                $('#dinner_name').puidropdown({
-                    data: function (callback) {
-                        $.ajax({
-                            type: "GET",
-                            url: 'services/get_active_dinner_data.php',
-                            dataType: "json",
-                            context: this,
-                            success: function (response) {
-                                var items = [];
-                                if (response.success === true) {
-                                    $.each(response.data, function (key, val) {
-                                        var item = new Object();
-                                        item.label = val.NAME;
-                                        item.value = val.ID;
-                                        items.push(item);
-                                    });
-                                } else {
-                                    var item = new Object();
-                                    item.label = 'Brak danych';
-                                    item.value = -1;
-                                    items.push(item);
-                                    $('#orderMealsTopButtons').hide();
-                                }
-
-                                callback.call(this, items);
-                            }
-                        });
-                    }
+                $('#number_of_portions').puispinner({
+                    min: 1,
+                    max: 100
                 });
-                $('#number_of_portions').puispinner(
-                        {
-                            min: 1,
-                            max: 100
-                        });
-
-
                 $('#edit_dialog_menu').puidialog({
                     resizable: false,
                     draggable: false,
@@ -150,7 +121,7 @@
                     minimizable: false,
                     maximizable: false,
                     modal: true,
-                    width: 650});
+                    width: 750});
                 $('#edit_dialog_menu #bt_save').puibutton({// Fire the submit event of the dialog form 
                     icon: 'ui-icon-disk'
                 });
@@ -199,6 +170,28 @@
                 $('#menu_form').submit(function (event) {
                     var result = $("#menu_form")[0].checkValidity();
                     if (result) {
+
+                        var selections = $('#dinnerMenuTableGrid').puidatatable('getSelection');
+
+                        if (selections.length === 1) {
+                            var selection = selections[0];
+
+                            if (selection.ID < 0) {
+                                $('#edit_dialog_menu').puidialog('hide');
+                                $('#tableGrid').puidatatable('reload');
+                                $('#messages').puigrowl('show', [{severity: 'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
+                                return;
+                            }
+
+                            $('input[name="dinner_name"]').val(selection.ID);
+                        } else {
+                            $('#edit_dialog_menu').puidialog('hide');
+                            $('#tableGrid').puidatatable('reload');
+                            $('#messages').puigrowl('show', [{severity: 'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
+                            return;
+                        }
+
+
                         var product = $('#menu_form').serializeArray();
                         $.ajax({
                             type: "POST",
@@ -220,6 +213,48 @@
                         });
                     }
                     event.preventDefault();
+                });
+            }
+
+            function initDinnerMenuGrid() {
+                $('#dinnerMenuTableGrid').puidatatable({
+                    caption: null,
+                    paginator: {
+                        rows: 10
+                    },
+                    selectionMode: 'single',
+                    columns: [
+                        {field: 'NAME', headerText: 'Nazwa dania', filter: true, sortable: false},
+                    ],
+                    datasource: function (callback, ui) {
+                        var uri = 'services/get_active_dinner_data.php';
+                        $.ajax({
+                            type: "GET",
+                            url: uri,
+                            dataType: "json",
+                            context: this,
+                            success: function (response) {
+
+                                if (response.success === true) {
+                                    var array = new Array();
+
+                                    $.each(response.data, function (key, val) {
+                                        var newRow = new Object();
+                                        newRow.ID = val.ID;
+                                        newRow.NAME = val.NAME;
+                                        array.push(newRow);
+                                    });
+
+                                    callback.call(this, array);
+                                } else {
+                                    callback.call(this, response.rows);
+                                }
+                            },
+                            error: function (response) {
+                                alert('error');
+                            }
+                        });
+                    }
                 });
             }
 
@@ -633,18 +668,17 @@
         </div>
 
         <!-- menu form dialog -->
-        <div id="edit_dialog_menu" title="Nowe menu">
+        <div id="edit_dialog_menu" title="Nowe menu" style="margin-top: -200px">
             <form id="menu_form">
                 <div>
                     <input name="menu_id" type="hidden">
                     <input name="menu_date" type="hidden">
+                    <input name="dinner_name" type="hidden">
                     <div class="ui-grid ui-grid-responsive">
                         <div class="ui-grid-row">
-                            <div class="ui-grid-col-4">
+                            <div class="ui-grid-col-12">
                                 <label class="required">Nazwa posiłku:</label>
-                            </div>
-                            <div class="ui-grid-col-4">
-                                <select id="dinner_name" name="dinner_name"></select>
+                                <div id="dinnerMenuTableGrid" style="margin-top:5px"></div>
                             </div>
                         </div>
                         <div class="ui-grid-row">
