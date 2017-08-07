@@ -45,7 +45,7 @@
                                 if (response.success === true) {
                                     $.each(response.data, function (key, val) {
                                         var item = new Object();
-                                        item.label = val.dinner_name;
+                                        item.label = val.dinner_name + ' [Dostępna ilość:' + val.number_of_portions + ']';
                                         item.value = val.id;
                                         items.push(item);
                                     });
@@ -55,6 +55,10 @@
                                     item.value = -1;
                                     items.push(item);
                                     $('#orderMealsTopButtons').hide();
+                                    $('#messages').puigrowl('show', [{severity: 'error', summary: 'Brak dań do zamówienia!', detail: 'Przykro mi wszystko zostało zjedzone.'}]);
+                                    setTimeout(function () {
+                                        window.location.href = "../";
+                                    }, 3000);
                                 }
 
                                 callback.call(this, items);
@@ -82,11 +86,16 @@
                                 var summaryMsg = response.action === 'new' ? 'Zapis posiłku' : 'Aktualizacja posiłku';
                                 var infoMsg = response.success === true ? 'info' : 'error';
                                 $('#messages').puigrowl('show', [{severity: infoMsg, summary: summaryMsg, detail: response.msg}]);
-                                window.location.href = "../";
+                                $('#orderMealsTopButtons').hide();
+                                setTimeout(function () {
+                                    window.location.href = "../";
+                                }, 2000);
                             },
                             error: function (response) {
-                                $('#messages').puigrowl('show', [{severity: 'error', summary: 'Błąd serwisu!', detail: 'Oups! Unable to save data.'}]);
-                                window.location.href = "../";
+                                $('#messages').puigrowl('show', [{severity: 'error', summary: 'Błąd serwisu!', detail: 'Nieoczekiwany błąd możliwe, że twój posiłek jest już niedostępny.'}]);
+                                setTimeout(function () {
+                                    window.location.href = "./";
+                                }, 3000);
                             }
                         });
                     }

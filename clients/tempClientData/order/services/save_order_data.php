@@ -29,7 +29,12 @@ if ($action === 'new') {
             $error_msg = "Przekroczenie czasu zamówienia!";
         } else {
             $result = $orderRepo->saveOrder($user_name, $menu_id, $meal_amount, $resultRow['clientId']);
-            $success_msg = 'Zamówienie złożone.';
+
+            if ($result === true) {
+                $success_msg = 'Zamówienie złożone.';
+            } else {
+                $error_msg = "B��d zapisu";
+            }
         }
     } else {
         $error_msg = 'Nieznany klient!';

@@ -33,7 +33,6 @@ class CreateClientFolder {
     }
 
     private function createHtAccess() {
-        return;
         $loginClientName = strtolower(preg_replace('/\s+/', '', $this->clientName));
         $file = fopen($this->dest . "/order/.htaccess", "a");
         fwrite($file, 'AuthType Basic' . PHP_EOL);
@@ -41,7 +40,6 @@ class CreateClientFolder {
         fwrite($file, 'AuthUserFile \'' . $_SERVER['DOCUMENT_ROOT'] . "/clients/" . $this->clientName . '/.htpasswd\'' . PHP_EOL);
         fwrite($file, 'Require user ' . $loginClientName . PHP_EOL);
         fclose($file);
-
         $file = fopen($this->dest . "/.htpasswd", "a");
         fwrite($file, $loginClientName . ':' . crypt_apr1_md5($this->clientPass) . PHP_EOL);
         fclose($file);

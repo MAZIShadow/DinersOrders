@@ -49,6 +49,7 @@
             }
 
             function initMenu() {
+                initDinnerMenuGrid();
                 $('#menuTopButtons').puifieldset();
                 $('#menuTopButtons #addMenuButton').puibutton({
                     icon: 'ui-icon-circle-plus'
@@ -58,7 +59,7 @@
                     $("input[name='menu_id']").val(-1);
                     $("input[name='menu_date']").val(globalDate);
                     $('#edit_dialog_menu').puidialog('show');
-                    initDinnerMenuGrid();
+                    $('#dinnerMenuTableGrid').puidatatable('reload');
                 });
                 $('#menuTopButtons #deleteMenuButton').puibutton({
                     icon: 'ui-icon-circle-minus'
@@ -71,7 +72,6 @@
                         if (selection.id < 0) {
                             return;
                         }
-
 
                         $('#remove_dialog_menu_label').text('Usuń posiłek: ' + selection.dinner_name);
                         $('#remove_dialog_menu').puidialog('show');
@@ -90,9 +90,11 @@
                     },
                     selectionMode: 'single',
                     columns: [
-                        {field: 'dinner_name', headerText: 'Nazwa posiłku', sortable: false},
-                        {field: 'number_of_portions', headerText: 'Liczba dostępnych posiłków', sortable: false}
+                        {field: 'dinner_name', headerText: 'Nazwa posiłku', sortable: true},
+                        {field: 'number_of_portions_left', headerText: 'Liczba dostępnych posiłków', sortable: false},
+                        {field: 'number_of_portions', headerText: 'Liczba posiłków w dniu', sortable: false}
                     ],
+                    emptyMessage: 'Brak menu',
                     datasource: function (callback, ui) {
                         var uri = 'services/get_menu_data.php?date=' + globalDate;
                         $.ajax({
@@ -191,7 +193,6 @@
                             return;
                         }
 
-
                         var product = $('#menu_form').serializeArray();
                         $.ajax({
                             type: "POST",
@@ -202,8 +203,12 @@
                             success: function (response) {
                                 var summaryMsg = response.action === 'new' ? 'Zapis posiłku' : 'Aktualizacja posiłku';
                                 $('#edit_dialog_menu').puidialog('hide');
-                                $('#tableGrid').puidatatable('reload');
+                                //$('#tableGrid').puidatatable('reload');
                                 $('#messages').puigrowl('show', [{severity: response.success ? 'info' : 'error', summary: summaryMsg, detail: response.msg}]);
+
+                                setTimeout(function () {
+                                    window.location.href = "./";
+                                }, 1000);
                             },
                             error: function (response) {
                                 $('#edit_dialog_menu').puidialog('hide');
@@ -224,8 +229,9 @@
                     },
                     selectionMode: 'single',
                     columns: [
-                        {field: 'NAME', headerText: 'Nazwa dania', filter: true, sortable: false},
+                        {field: 'NAME', headerText: 'Nazwa dania', filter: true, sortable: true},
                     ],
+                    emptyMessage: 'Brak dań',
                     datasource: function (callback, ui) {
                         var uri = 'services/get_active_dinner_data.php';
                         $.ajax({
@@ -314,6 +320,7 @@
                         {field: 'NAME', headerText: 'Nazwa klienta', sortable: false},
                         {field: 'DESCRIPTION', headerText: 'Opis', sortable: false}
                     ],
+                    emptyMessage: 'Brak klientów',
                     datasource: function (callback, ui) {
                         var uri = 'services/get_client_data.php';
                         $.ajax({
@@ -478,8 +485,9 @@
                     },
                     selectionMode: 'single',
                     columns: [
-                        {field: 'NAME', headerText: 'Nazwa dania', sortable: false},
+                        {field: 'NAME', headerText: 'Nazwa dania', sortable: true},
                     ],
+                    emptyMessage: 'Brak dań',
                     datasource: function (callback, ui) {
                         var uri = 'services/get_dinner_data.php';
                         $.ajax({

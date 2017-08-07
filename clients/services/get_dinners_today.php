@@ -1,9 +1,10 @@
 <?php
 
 require_once("../../resources/php/classes/MenuRepository.class.php");
-$dateToday = date('Y-m-d');
+require_once("../../resources/php/classes/Consts.php");
+$dateToday = date(Consts::DAY_DATE_FORMAT);
 $menuRepo = new MenuRepository();
-$result = $menuRepo->getDinnersForDate($dateToday);
+$result = $menuRepo->getAvaiableDinnersForDate($dateToday);
 $resultset['success'] = $result != null;
 $resultset['data'] = null;
 

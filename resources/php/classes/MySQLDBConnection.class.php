@@ -53,6 +53,10 @@ class MySQLDBConnection {
             return $resultset;
         }
     }
+    
+    public function affectedRows() {
+        return $this->mysqli->affected_rows;
+    }
 
     public function runPreparedQuery($query, $bindParams) {
         $stmt = $this->prepareQuery($query);
