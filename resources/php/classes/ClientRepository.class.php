@@ -98,7 +98,7 @@ class ClientRepository {
 
     private function generateOrderTimeLimit() {
         $todaysEndDate = new DateTime('today');
-        $todaysEndDate->setTime(21, 50, 00);
+        $todaysEndDate->setTime(11, 50, 00);
         
         return $todaysEndDate->format(Consts::FULL_DATE_FORMAT);
     }
